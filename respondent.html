@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABU SmartSurvey — Respondent Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g900:#001A00;--g800:#002800;--g700:#003D00;--g600:#006400;
+  --g500:#008000;--g400:#22A722;--g300:#4DC94D;--g100:#E8F5E8;--g50:#F0F7F0;
+  --gold:#C8961A;--gold-l:#F0C040;--white:#FFFFFF;
+  --text:#1A2E1A;--text-m:#4A6B4A;--text-l:#7A9B7A;
+  --radius:16px;--border:#ddefdd;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#f0f0f0}::-webkit-scrollbar-thumb{background:var(--g400);border-radius:3px}
+
+/* ─── LOGIN ─── */
+#login-screen{position:fixed;inset:0;z-index:9999;background:var(--g900);display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .6s,visibility .6s}
+#login-screen.out{opacity:0;visibility:hidden;pointer-events:none}
+.login-wrap{width:100%;max-width:460px;animation:fadeUp .7s ease both}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-crest{width:64px;height:64px;margin:0 auto 14px;filter:drop-shadow(0 0 14px rgba(0,180,0,.5))}
+.login-crest svg{width:100%;height:100%}
+.login-logo h1{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#fff}
+.login-logo p{font-size:12px;color:var(--g300);letter-spacing:1.5px;margin-top:4px;text-transform:uppercase}
+.login-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:32px;backdrop-filter:blur(20px)}
+.login-card h2{font-family:'Cinzel',serif;font-size:18px;color:#fff;margin-bottom:5px}
+.login-card .lsub{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:26px}
+.lf-group{margin-bottom:16px}
+.lf-group label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.lf-input{position:relative}
+.lf-input i.fi{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:14px;pointer-events:none}
+.lf-input input{width:100%;padding:12px 13px 12px 40px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .3s}
+.lf-input input::placeholder{color:rgba(255,255,255,.22)}
+.lf-input input:focus{border-color:var(--g400)}
+.lf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lf-select{width:100%;padding:12px 13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:rgba(255,255,255,.7);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .3s;appearance:none}
+.lf-select:focus{border-color:var(--g400)}
+.lf-select option{background:#002800;color:#fff}
+.lf-err{font-size:12px;color:#FF6B6B;margin-top:6px;display:none}
+.lf-err.show{display:block}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:10px;transition:transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,100,0,.5)}
+.login-hint{text-align:center;margin-top:16px;font-size:12px;color:rgba(255,255,255,.28)}
+.login-hint span{color:var(--g300)}
+.login-back{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.35);text-decoration:none;font-size:13px;margin-bottom:22px;transition:color .2s}
+.login-back:hover{color:var(--g300)}
+.login-toggle{text-align:center;margin-top:18px;font-size:13px;color:rgba(255,255,255,.4)}
+.login-toggle span{color:var(--g300);cursor:pointer;font-weight:600}
+.login-toggle span:hover{text-decoration:underline}
+
+/* ─── DASHBOARD ─── */
+#dashboard{display:none;min-height:100vh;flex-direction:column}
+#dashboard.active{display:flex}
+
+/* NAV */
+.dash-nav{height:66px;background:var(--g900);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.3)}
+.dash-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.dash-logo-crest{width:36px;height:36px}
+.dash-logo-crest svg{width:100%;height:100%}
+.dash-logo-txt strong{display:block;font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:#fff;line-height:1.1}
+.dash-logo-txt small{font-size:10px;color:var(--g300);letter-spacing:1.5px;text-transform:uppercase;font-family:'Inter',sans-serif}
+.dash-nav-r{display:flex;align-items:center;gap:12px}
+.notif-btn{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);cursor:pointer;font-size:15px;position:relative}
+.notif-btn .nbdg{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:var(--gold);border-radius:50%;font-size:9px;color:var(--g900);font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--g900)}
+.dash-user{display:flex;align-items:center;gap:9px}
+.dash-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.dash-user-inf strong{display:block;font-size:13px;color:#fff;font-weight:600;line-height:1.2}
+.dash-user-inf span{font-size:11px;color:var(--g300)}
+.btn-logout{padding:7px 14px;background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.25);border-radius:8px;color:rgba(255,140,140,.9);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-logout:hover{background:rgba(255,80,80,.22);color:#fff}
+
+/* LAYOUT */
+.dash-body{display:grid;grid-template-columns:240px 1fr 290px;flex:1;min-height:0;gap:0}
+
+/* SIDEBAR LEFT */
+.dash-sidebar{background:#fff;border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;position:sticky;top:66px;height:calc(100vh - 66px);overflow-y:auto}
+.sb-section{padding:0 14px;margin-bottom:4px}
+.sb-label{font-size:10px;font-weight:700;color:var(--text-l);text-transform:uppercase;letter-spacing:1.5px;padding:10px 10px 5px}
+.sb-link{display:flex;align-items:center;gap:11px;padding:10px 10px;border-radius:10px;color:var(--text-m);font-size:13px;font-weight:500;transition:all .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
+.sb-link:hover{background:var(--g100);color:var(--g700)}
+.sb-link.active{background:var(--g100);color:var(--g700);font-weight:700}
+.sb-link.active i{color:var(--g600)}
+.sb-link i{width:17px;font-size:14px;color:var(--text-l);flex-shrink:0}
+.sb-link .sb-ct{margin-left:auto;background:var(--g600);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.sb-profile-card{margin:14px 14px 0;background:var(--g50);border-radius:12px;padding:16px;border:1px solid var(--border)}
+.sb-av-lg{width:48px;height:48px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:#fff}
+.sb-profile-card h4{font-family:'Cinzel',serif;font-size:13px;text-align:center;color:var(--text);margin-bottom:2px}
+.sb-profile-card p{font-size:11px;text-align:center;color:var(--text-l);margin-bottom:12px}
+.sb-prof-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sps{background:#fff;border-radius:8px;padding:8px;text-align:center;border:1px solid var(--border)}
+.sps strong{display:block;font-size:15px;font-weight:700;color:var(--text)}
+.sps span{font-size:10px;color:var(--text-l)}
+
+/* MAIN FEED */
+.dash-main{padding:24px;overflow-y:auto;background:var(--g50)}
+.feed-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.feed-hd h1{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:var(--text)}
+.feed-hd p{font-size:13px;color:var(--text-m);margin-top:2px}
+.filter-bar{display:flex;gap:4px;background:#fff;border-radius:12px;padding:4px;border:1px solid var(--border);width:fit-content}
+.flt-btn{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text-m);font-family:'Inter',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px}
+.flt-btn.on{background:var(--g600);color:#fff;box-shadow:0 3px 10px rgba(0,100,0,.3)}
+
+/* FEED CARD */
+.feed-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:18px;overflow:hidden;transition:box-shadow .3s}
+.feed-card:hover{box-shadow:0 8px 28px rgba(0,100,0,.09)}
+.feed-card.featured{border-color:var(--g400);box-shadow:0 0 0 2px rgba(0,100,0,.12)}
+.fc-header{padding:18px 20px 14px;display:flex;align-items:flex-start;gap:13px;border-bottom:1px solid var(--border)}
+.fc-av{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:#fff}
+.fc-info{flex:1;min-width:0}
+.fc-name{font-size:14px;font-weight:700;color:var(--text)}
+.fc-meta{font-size:12px;color:var(--text-l);margin-top:2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fc-meta i{font-size:10px}
+.fc-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.fc-badge.live{background:#dcfce7;color:#16a34a}
+.fc-badge.live::before{content:'';width:6px;height:6px;border-radius:50%;background:#16a34a;animation:pulse 1.5s infinite}
+.fc-badge.new-post{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:var(--g900)}
+.fc-featured-tag{display:flex;align-items:center;gap:5px;padding:4px 10px;background:linear-gradient(135deg,var(--g700),var(--g600));color:#fff;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.fc-body{padding:16px 20px}
+.fc-category{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:var(--g100);color:var(--g700);border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.fc-body h3{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4}
+.fc-body p{font-size:13px;color:var(--text-m);line-height:1.7}
+.fc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.fc-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--g50);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text-m)}
+.fc-tag i{font-size:10px;color:var(--g500)}
+.fc-stats{padding:10px 20px;background:var(--g50);display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--border)}
+.fc-stat{text-align:center;padding:8px 4px}
+.fc-stat strong{display:block;font-size:15px;font-weight:700;color:var(--text)}
+.fc-stat span{font-size:10px;color:var(--text-l);text-transform:uppercase;letter-spacing:.5px}
+.fc-prog{padding:10px 20px;border-bottom:1px solid var(--border)}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text-l);margin-bottom:5px}
+.prog-bar{height:5px;background:#e5f0e5;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--g600),var(--g400));border-radius:3px}
+
+/* STAR RATING */
+.fc-rating{padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.rating-label{font-size:12px;color:var(--text-m);font-weight:600}
+.stars-wrap{display:flex;gap:3px}
+.star-btn{background:none;border:none;cursor:pointer;font-size:20px;color:#d1d5db;transition:color .15s,transform .15s;padding:0 1px;line-height:1}
+.star-btn:hover,.star-btn.filled{color:var(--gold)}
+.star-btn:hover{transform:scale(1.2)}
+.rating-avg{font-size:13px;font-weight:700;color:var(--text);margin-left:4px}
+.rating-count{font-size:11px;color:var(--text-l)}
+
+/* ACTION BAR */
+.fc-actions{padding:12px 20px;display:flex;align-items:center;gap:8px}
+.act-btn{display:flex;align-items:center;gap:7px;padding:8px 15px;border-radius:9px;border:1.5px solid var(--border);background:#fff;color:var(--text-m);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.act-btn:hover{border-color:var(--g400);color:var(--g700);background:var(--g100)}
+.act-btn.liked{border-color:var(--g400);background:var(--g100);color:var(--g700)}
+.act-btn.liked i{color:var(--g600)}
+.act-btn.fill{background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(0,100,0,.3);margin-left:auto}
+.act-btn.fill:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,100,0,.4)}
+.act-btn.fill.done{background:linear-gradient(135deg,#16a34a,#22a722);cursor:default}
+.act-btn i{font-size:14px}
+
+/* COMMENTS */
+.fc-comments{border-top:1px solid var(--border);padding:0}
+.comments-toggle{width:100%;padding:11px 20px;background:var(--g50);border:none;cursor:pointer;text-align:left;font-size:12px;font-weight:600;color:var(--text-m);font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;transition:background .2s}
+.comments-toggle:hover{background:var(--g100)}
+.comments-toggle i{color:var(--g500)}
+.comments-inner{display:none;padding:16px 20px;background:#fff}
+.comments-inner.open{display:block}
+.comment-item{display:flex;gap:10px;margin-bottom:14px}
+.comment-item:last-child{margin-bottom:0}
+.cm-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:#fff}
+.cm-bubble{flex:1;background:var(--g50);border-radius:0 12px 12px 12px;padding:10px 13px}
+.cm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.cm-top strong{font-size:12px;font-weight:700;color:var(--text)}
+.cm-top time{font-size:10px;color:var(--text-l)}
+.cm-bubble p{font-size:13px;color:var(--text-m);line-height:1.5}
+.comment-input-wrap{display:flex;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.cm-inp{flex:1;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;transition:border-color .3s;background:#fff}
+.cm-inp:focus{border-color:var(--g500)}
+.cm-inp::placeholder{color:var(--text-l)}
+.cm-send{padding:10px 16px;background:var(--g600);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.cm-send:hover{background:var(--g500)}
+
+/* RIGHT SIDEBAR */
+.dash-right{padding:20px 18px;position:sticky;top:66px;height:calc(100vh - 66px);overflow-y:auto;border-left:1px solid var(--border);background:#fff;display:flex;flex-direction:column;gap:18px}
+.widget{background:var(--g50);border-radius:14px;border:1px solid var(--border);overflow:hidden}
+.widget-hd{padding:14px 16px 10px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);background:#fff}
+.widget-hd i{color:var(--g600);font-size:14px}
+.widget-hd h3{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--text)}
+.widget-body{padding:14px 16px}
+
+/* LEADERBOARD IN SIDEBAR */
+.lb-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.lb-item:last-child{border-bottom:none}
+.lb-rk{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.rk1{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:var(--g900)}
+.rk2{background:linear-gradient(135deg,#9CA3AF,#D1D5DB);color:#1f2937}
+.rk3{background:linear-gradient(135deg,#B45309,#F59E0B);color:#fff}
+.rko{background:rgba(0,0,0,.06);color:var(--text-m)}
+.lb-av-sm{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:#fff}
+.lb-name{flex:1;min-width:0}
+.lb-name strong{display:block;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-name span{font-size:10px;color:var(--text-l)}
+.lb-score{font-size:12px;font-weight:700;color:var(--g600);display:flex;align-items:center;gap:3px}
+.lb-score i{font-size:10px}
+
+/* BADGES WIDGET */
+.bdg-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.bdg-it{background:#fff;border-radius:10px;padding:10px 6px;text-align:center;border:1px solid var(--border);transition:all .2s}
+.bdg-it:hover{border-color:var(--g400);transform:translateY(-2px)}
+.bdg-it i{font-size:20px;margin-bottom:5px;display:block}
+.bdg-it.gd i{color:var(--gold)}
+.bdg-it.gr i{color:var(--g600)}
+.bdg-it.sk i{color:var(--g400)}
+.bdg-it.locked i{color:#d1d5db}
+.bdg-it strong{display:block;font-size:10px;color:var(--text);font-weight:700}
+.bdg-it span{font-size:9px;color:var(--text-l)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--g900);color:#fff;padding:13px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:9999;opacity:0;transform:translateY(18px);transition:all .4s;box-shadow:0 8px 30px rgba(0,0,0,.3);max-width:330px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast i{color:var(--g300);font-size:15px;flex-shrink:0}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all .3s}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;transform:translateY(28px);transition:transform .3s;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-hd{padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-hd h2{font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:var(--text)}
+.modal-hd p{font-size:12px;color:var(--text-m);margin-top:3px}
+.modal-close{width:34px;height:34px;border-radius:8px;border:none;background:var(--g50);cursor:pointer;font-size:14px;color:var(--text-m);transition:all .2s;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--g100)}
+.modal-body{padding:22px 24px}
+.survey-iframe-wrap{border-radius:12px;overflow:hidden;border:2px solid var(--border)}
+.survey-iframe-wrap iframe{width:100%;height:520px;border:none;display:block}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;background:#fff;border-radius:var(--radius);border:1px dashed var(--border)}
+.empty i{font-size:42px;color:#c5ddc5;display:block;margin-bottom:14px}
+.empty h3{font-family:'Cinzel',serif;font-size:17px;color:var(--text);margin-bottom:7px}
+.empty p{font-size:13px;color:var(--text-m);max-width:300px;margin:0 auto}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.dash-right{display:none}}
+@media(max-width:800px){.dash-body{grid-template-columns:1fr}.dash-sidebar{display:none}.dash-main{padding:16px}}
+@media(max-width:500px){.fc-stats{grid-template-columns:repeat(3,1fr)}.dash-user-inf{display:none}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes popIn{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <a href="index.html" class="login-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    <div class="login-logo">
+      <div class="login-crest">
+        <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="color:#00AA00">
+          <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="6" fill="none"/>
+          <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="5" fill="none"/>
+          <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="4" fill="none"/>
+          <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="5" fill="none"/>
+          <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="3.5" fill="none"/>
+          <path d="M75 175 Q100 165 125 175" stroke="currentColor" stroke-width="3" fill="none"/>
+          <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="3" fill="none"/>
+          <circle cx="100" cy="95" r="4" stroke="currentColor" stroke-width="3" fill="none"/>
+        </svg>
+      </div>
+      <h1>ABU SmartSurvey</h1>
+      <p id="login-mode-label">Respondent Portal</p>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="login-card" id="login-form-wrap">
+      <h2 id="lcard-title">Sign In</h2>
+      <p class="lsub" id="lcard-sub">Welcome back — sign in to your respondent account.</p>
+
+      <div class="lf-group">
+        <label>Username</label>
+        <div class="lf-input">
+          <i class="fas fa-user fi"></i>
+          <input type="text" id="inp-user" placeholder="e.g. maryam_eco" autocomplete="off">
+        </div>
+      </div>
+      <div class="lf-group">
+        <label>Password</label>
+        <div class="lf-input">
+          <i class="fas fa-lock fi"></i>
+          <input type="password" id="inp-pass" placeholder="Your password" autocomplete="off">
+        </div>
+      </div>
+      <p class="lf-err" id="login-err"><i class="fas fa-exclamation-circle"></i> <span id="login-err-msg">Incorrect credentials. Try again.</span></p>
+      <button class="btn-login" id="login-btn" onclick="doLogin()">
+        <i class="fas fa-sign-in-alt"></i> <span id="login-btn-txt">Sign In</span>
+      </button>
+      <p class="login-toggle">Don't have an account? <span onclick="showRegister()">Create one free</span></p>
+      <p class="login-hint">Demo: <span>any username &amp; any password</span> creates an account</p>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="login-card" id="register-form-wrap" style="display:none">
+      <h2>Create Account</h2>
+      <p class="lsub">Join as a respondent and start contributing to research.</p>
+      <div class="lf-group">
+        <label>Full Name</label>
+        <div class="lf-input">
+          <i class="fas fa-id-card fi"></i>
+          <input type="text" id="reg-name" placeholder="e.g. Aisha Musa Ibrahim">
+        </div>
+      </div>
+      <div class="lf-group">
+        <label>Username</label>
+        <div class="lf-input">
+          <i class="fas fa-user fi"></i>
+          <input type="text" id="reg-user" placeholder="Choose a username">
+        </div>
+      </div>
+      <div class="lf-row">
+        <div class="lf-group">
+          <label>Faculty</label>
+          <select class="lf-select" id="reg-faculty">
+            <option value="">Select Faculty</option>
+            <option>Social Sciences</option><option>Medicine &amp; Surgery</option>
+            <option>Engineering</option><option>Law</option>
+            <option>Agriculture</option><option>Sciences</option>
+            <option>Arts</option><option>Education</option>
+            <option>Management Sciences</option><option>Pharmaceutical Sciences</option>
+          </select>
+        </div>
+        <div class="lf-group">
+          <label>Level</label>
+          <select class="lf-select" id="reg-level">
+            <option>100L</option><option>200L</option><option>300L</option>
+            <option>400L</option><option>500L</option><option>Postgraduate</option>
+          </select>
+        </div>
+      </div>
+      <div class="lf-group">
+        <label>Password</label>
+        <div class="lf-input">
+          <i class="fas fa-lock fi"></i>
+          <input type="password" id="reg-pass" placeholder="Create a password">
+        </div>
+      </div>
+      <p class="lf-err" id="reg-err"><i class="fas fa-exclamation-circle"></i> <span id="reg-err-msg">Please fill all fields.</span></p>
+      <button class="btn-login" onclick="doRegister()">
+        <i class="fas fa-user-plus"></i> Create My Account
+      </button>
+      <p class="login-toggle">Already have an account? <span onclick="showLogin()">Sign in</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DASHBOARD ═══════════════ -->
+<div id="dashboard">
+  <!-- NAV -->
+  <nav class="dash-nav">
+    <a href="index.html" class="dash-logo">
+      <div class="dash-logo-crest">
+        <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="color:#00AA00">
+          <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="8" fill="none"/>
+          <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="6" fill="none"/>
+          <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="5" fill="none"/>
+          <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="5" fill="none"/>
+          <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="6" fill="none"/>
+          <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="5" fill="none"/>
+          <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="4" fill="none"/>
+          <circle cx="100" cy="95" r="4" stroke="currentColor" stroke-width="4" fill="none"/>
+        </svg>
+      </div>
+      <div class="dash-logo-txt"><strong>ABU SmartSurvey</strong><small>Respondent Portal</small></div>
+    </a>
+    <div class="dash-nav-r">
+      <div class="notif-btn"><i class="fas fa-bell"></i><div class="nbdg">3</div></div>
+      <div class="dash-user">
+        <div class="dash-av" id="nav-av" style="background:linear-gradient(135deg,#006400,#22A722)">A</div>
+        <div class="dash-user-inf"><strong id="nav-name">Respondent</strong><span id="nav-meta">ABU Zaria</span></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <div class="dash-body">
+    <!-- LEFT SIDEBAR -->
+    <aside class="dash-sidebar">
+      <div class="sb-section">
+        <div class="sb-label">Feed</div>
+        <button class="sb-link active" onclick="setFeedFilter('all',this)"><i class="fas fa-stream"></i> All Studies <span class="sb-ct" id="sb-all-ct">0</span></button>
+        <button class="sb-link" onclick="setFeedFilter('prof_sodq',this)"><i class="fas fa-star" style="color:var(--gold)"></i> Prof. Sodiq</button>
+        <button class="sb-link" onclick="setFeedFilter('participated',this)"><i class="fas fa-check-double"></i> Participated</button>
+      </div>
+      <div class="sb-section">
+        <div class="sb-label">Explore</div>
+        <button class="sb-link"><i class="fas fa-microscope"></i> Health &amp; Medicine</button>
+        <button class="sb-link"><i class="fas fa-users"></i> Social Sciences</button>
+        <button class="sb-link"><i class="fas fa-cog"></i> Engineering</button>
+        <button class="sb-link"><i class="fas fa-leaf"></i> Agriculture</button>
+      </div>
+      <div class="sb-profile-card">
+        <div class="sb-av-lg" id="sb-av-lg" style="background:linear-gradient(135deg,#006400,#22A722)">A</div>
+        <h4 id="sb-name">Your Name</h4>
+        <p id="sb-meta">ABU Zaria · 300L</p>
+        <div class="sb-prof-stats">
+          <div class="sps"><strong id="sb-done">0</strong><span>Done</span></div>
+          <div class="sps"><strong id="sb-liked">0</strong><span>Liked</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN FEED -->
+    <main class="dash-main">
+      <div class="feed-hd">
+        <div>
+          <h1>Research Feed</h1>
+          <p id="feed-greeting">Good to see you — new studies are waiting below.</p>
+        </div>
+        <div class="filter-bar">
+          <button class="flt-btn on" onclick="setSort('newest',this)"><i class="fas fa-clock"></i> Newest</button>
+          <button class="flt-btn" onclick="setSort('popular',this)"><i class="fas fa-fire"></i> Popular</button>
+          <button class="flt-btn" onclick="setSort('closing',this)"><i class="fas fa-hourglass-half"></i> Closing</button>
+        </div>
+      </div>
+      <div id="feed-container"></div>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="dash-right">
+      <!-- TOP CONTRIBUTORS -->
+      <div class="widget">
+        <div class="widget-hd"><i class="fas fa-trophy"></i><h3>Top Contributors</h3></div>
+        <div class="widget-body" style="padding:10px 14px">
+          <div class="lb-item">
+            <div class="lb-rk rk1">1</div>
+            <div class="lb-av-sm" style="background:linear-gradient(135deg,#006400,#22A722)">A</div>
+            <div class="lb-name"><strong>Aisha Musa</strong><span>Medicine · 500L</span></div>
+            <div class="lb-score"><i class="fas fa-check-circle"></i>47</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rk rk2">2</div>
+            <div class="lb-av-sm" style="background:linear-gradient(135deg,#C8961A,#F0C040)">K</div>
+            <div class="lb-name"><strong>Kabiru Ahmed</strong><span>Engineering · 400L</span></div>
+            <div class="lb-score"><i class="fas fa-check-circle"></i>41</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rk rk3">3</div>
+            <div class="lb-av-sm" style="background:linear-gradient(135deg,#003D00,#006400)">F</div>
+            <div class="lb-name"><strong>Fatima Bello</strong><span>Social Sci · 300L</span></div>
+            <div class="lb-score"><i class="fas fa-check-circle"></i>38</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rk rko">4</div>
+            <div class="lb-av-sm" style="background:linear-gradient(135deg,#1A4D1A,#22A722)">Y</div>
+            <div class="lb-name"><strong>Yusuf Mohammed</strong><span>Law · 500L</span></div>
+            <div class="lb-score"><i class="fas fa-check-circle"></i>35</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rk rko">5</div>
+            <div class="lb-av-sm" style="background:linear-gradient(135deg,#C8961A,#006400)">Z</div>
+            <div class="lb-name"><strong>Zainab Dantata</strong><span>Sciences · 200L</span></div>
+            <div class="lb-score"><i class="fas fa-check-circle"></i>29</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVE RESEARCHERS -->
+      <div class="widget">
+        <div class="widget-hd"><i class="fas fa-microscope"></i><h3>Featured Researchers</h3></div>
+        <div class="widget-body" style="padding:10px 14px">
+          <div class="lb-item">
+            <div class="lb-av-sm" style="background:linear-gradient(135deg,#006400,#22A722)">S</div>
+            <div class="lb-name"><strong>Prof. Sodiq</strong><span>ABU Zaria · Active</span></div>
+            <div class="fc-badge live" style="font-size:9px;padding:3px 7px">Live</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-av-sm" style="background:linear-gradient(135deg,#C8961A,#8B6400)">D</div>
+            <div class="lb-name"><strong>Dr. Danladi</strong><span>Social Sciences</span></div>
+            <div class="fc-badge" style="background:var(--g100);color:var(--g700);font-size:9px;padding:3px 7px">3 Studies</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-av-sm" style="background:linear-gradient(135deg,#003D00,#008000)">P</div>
+            <div class="lb-name"><strong>Prof. Patience</strong><span>Pharmacy</span></div>
+            <div class="fc-badge" style="background:var(--g100);color:var(--g700);font-size:9px;padding:3px 7px">2 Studies</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BADGES -->
+      <div class="widget">
+        <div class="widget-hd"><i class="fas fa-award"></i><h3>Your Badges</h3></div>
+        <div class="widget-body">
+          <div class="bdg-grid">
+            <div class="bdg-it gd" id="bdg-first"><i class="fas fa-star"></i><strong>First Study</strong><span>Complete 1</span></div>
+            <div class="bdg-it locked" id="bdg-active"><i class="fas fa-fire"></i><strong>Active</strong><span>Do 10+</span></div>
+            <div class="bdg-it locked" id="bdg-champ"><i class="fas fa-crown"></i><strong>Champion</strong><span>Top 5%</span></div>
+            <div class="bdg-it locked" id="bdg-streak"><i class="fas fa-medal"></i><strong>Streak</strong><span>30 days</span></div>
+            <div class="bdg-it locked" id="bdg-quick"><i class="fas fa-bolt"></i><strong>Quick</strong><span>24hr reply</span></div>
+            <div class="bdg-it locked" id="bdg-diamond"><i class="fas fa-gem"></i><strong>Diamond</strong><span>50+ done</span></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ═══════════════ SURVEY MODAL ═══════════════ -->
+<div class="modal-overlay" id="survey-modal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-hd">
+      <div>
+        <h2 id="smodal-title">Fill Survey</h2>
+        <p>Complete this questionnaire to contribute to this research</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-m);margin-bottom:14px;display:flex;align-items:center;gap:7px">
+        <i class="fas fa-info-circle" style="color:var(--g500)"></i>
+        The survey will open in a new tab. Once done, come back and mark it as completed.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a id="smodal-link" href="#" target="_blank" class="act-btn fill" style="margin-left:0">
+          <i class="fas fa-external-link-alt"></i> Open Questionnaire in New Tab
+        </a>
+        <button onclick="markDone()" class="act-btn" style="border-color:var(--g400);color:var(--g700)">
+          <i class="fas fa-check-double"></i> I've Completed It
+        </button>
+      </div>
+      <div style="margin-top:18px;background:var(--g50);border-radius:12px;border:1px solid var(--border);overflow:hidden">
+        <div style="padding:12px 16px;background:#fff;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-m);display:flex;align-items:center;gap:8px">
+          <i class="fas fa-link" style="color:var(--g500)"></i>
+          <span id="smodal-url" style="word-break:break-all;font-size:11px;color:var(--g600)"></span>
+        </div>
+        <div style="padding:20px;text-align:center">
+          <i class="fas fa-poll-h" style="font-size:36px;color:#c5ddc5;display:block;margin-bottom:10px"></i>
+          <p style="font-size:13px;color:var(--text-m)">Click the button above to open the questionnaire in a new tab, then return here to mark it done.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toast-msg">Done!</span></div>
+
+<script>
+// ══════════════ CONSTANTS ══════════════
+const STORE_KEY = 'abu_smartsurvey_studies';
+const INTERACT_KEY = 'abu_interactions';
+const USERS_KEY = 'abu_resp_users';
+const SESSION_KEY = 'abu_resp_session';
+
+const COLORS = [
+  'linear-gradient(135deg,#006400,#22A722)',
+  'linear-gradient(135deg,#C8961A,#F0C040)',
+  'linear-gradient(135deg,#003D00,#008000)',
+  'linear-gradient(135deg,#1A4D1A,#4DC94D)',
+  'linear-gradient(135deg,#C8961A,#006400)',
+  'linear-gradient(135deg,#0D3B0D,#4DC94D)',
+];
+
+// 10 demo studies (shown even when researcher hasn't posted yet)
+const DEMO_STUDIES = [
+  {id:'demo_1',title:'Impact of Social Media on Academic Performance Among Nigerian Undergraduates',category:'Social Sciences',description:'This study investigates how daily social media usage — particularly WhatsApp, TikTok, and Instagram — affects the academic performance of university students. Your honest participation will contribute to valuable insights for university policy.',department:'All Departments',target:300,duration:'15 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:187,date:'09 Jun 2025',timestamp:Date.now()-3600000,researcher:'Prof. Sodiq',researcher_id:'prof_sodq',avatarColor:COLORS[0]},
+  {id:'demo_2',title:'Mental Health Awareness and Help-Seeking Behaviour Among Medical Students',category:'Health & Medicine',description:'An exploratory study on how medical students at Nigerian universities perceive mental health and their willingness to seek professional help. Confidential and anonymous.',department:'Faculty of Medicine',target:150,duration:'10 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'Undergraduate (100L–500L)',status:'Live',responses:94,date:'07 Jun 2025',timestamp:Date.now()-172800000,researcher:'Dr. Danladi Audu',researcher_id:'dr_danladi',avatarColor:COLORS[1]},
+  {id:'demo_3',title:'Adoption of Renewable Energy Technologies in Northern Nigerian Households',category:'Engineering & Technology',description:'This engineering research examines public awareness and adoption rates of solar energy and biogas technologies in Northern Nigeria. Takes about 20 minutes to complete.',department:'Faculty of Engineering',target:200,duration:'20 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:112,date:'06 Jun 2025',timestamp:Date.now()-259200000,researcher:'Prof. Emeka Eze',researcher_id:'prof_emeka',avatarColor:COLORS[2]},
+  {id:'demo_4',title:'Food Security and Dietary Habits of University Students in Zaria',category:'Agriculture & Environment',description:'A nutrition and food science study examining what students eat, how food prices affect dietary choices, and food security challenges on campus.',department:'Faculty of Agriculture',target:250,duration:'15 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:203,date:'05 Jun 2025',timestamp:Date.now()-345600000,researcher:'Dr. Amina Suleiman',researcher_id:'dr_amina',avatarColor:COLORS[3]},
+  {id:'demo_5',title:'Student Perceptions of Online Learning Platforms Post-COVID-19',category:'Education',description:'Examining how Nigerian university students feel about e-learning platforms introduced during COVID-19 and whether these platforms have been effective in the long term.',department:'All Departments',target:400,duration:'10 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:321,date:'04 Jun 2025',timestamp:Date.now()-432000000,researcher:'Prof. Patience Oluwaseun',researcher_id:'prof_patience',avatarColor:COLORS[4]},
+  {id:'demo_6',title:'Land Tenure Systems and Agricultural Productivity in Kaduna State',category:'Agriculture & Environment',description:'A detailed study on how different land ownership systems affect agricultural output in Kaduna State. Targeting students from agricultural and related backgrounds.',department:'Faculty of Agriculture',target:120,duration:'20 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:67,date:'03 Jun 2025',timestamp:Date.now()-518400000,researcher:'Dr. Aliyu Bello',researcher_id:'dr_aliyu',avatarColor:COLORS[5]},
+  {id:'demo_7',title:'Gender Inequality in STEM Fields: Experiences of Female Engineering Students',category:'Social Sciences',description:'A qualitative and quantitative study exploring barriers, biases, and experiences of female students in STEM programs at Nigerian universities.',department:'Faculty of Engineering',target:180,duration:'15 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:145,date:'02 Jun 2025',timestamp:Date.now()-604800000,researcher:'Dr. Ngozi Eze',researcher_id:'dr_ngozi',avatarColor:COLORS[0]},
+  {id:'demo_8',title:'Drug Abuse and Substance Use Patterns Among Nigerian Undergraduates',category:'Health & Medicine',description:'A confidential public health study examining awareness, exposure, and attitudes toward substance use among students. All responses are completely anonymous.',department:'All Departments',target:500,duration:'10 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:278,date:'01 Jun 2025',timestamp:Date.now()-691200000,researcher:'Prof. Umar Garba',researcher_id:'prof_umar',avatarColor:COLORS[1]},
+  {id:'demo_9',title:'Financial Literacy and Money Management Among ABU Students',category:'Economics & Business',description:'Do students understand budgeting, savings, and financial planning? This Economics study measures financial literacy levels and behavioural patterns.',department:'Faculty of Management Sciences',target:350,duration:'15 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:189,date:'30 May 2025',timestamp:Date.now()-777600000,researcher:'Dr. Hadiza Yusuf',researcher_id:'dr_hadiza',avatarColor:COLORS[2]},
+  {id:'demo_10',title:'Attitudes Towards Entrepreneurship Among Nigerian Law Students',category:'Law & Governance',description:'This interdisciplinary research investigates whether law students at Nigerian universities intend to pursue entrepreneurship and what factors influence that decision.',department:'Faculty of Law',target:100,duration:'10 minutes',link:'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog',level:'All Levels',status:'Live',responses:43,date:'28 May 2025',timestamp:Date.now()-950400000,researcher:'Prof. Halima Idris',researcher_id:'prof_halima',avatarColor:COLORS[3]},
+];
+
+// ══════════════ STATE ══════════════
+let currentUser = null;
+let currentFilter = 'all';
+let currentSort = 'newest';
+let activeSurveyId = null;
+
+// ══════════════ AUTH ══════════════
+function getUsers(){ try{return JSON.parse(localStorage.getItem(USERS_KEY))||{};}catch{return{};} }
+function saveUsers(u){ localStorage.setItem(USERS_KEY,JSON.stringify(u)); }
+function getSession(){ try{return JSON.parse(localStorage.getItem(SESSION_KEY));}catch{return null;} }
+function saveSession(u){ localStorage.setItem(SESSION_KEY,JSON.stringify(u)); }
+
+function showLogin(){ document.getElementById('login-form-wrap').style.display='block'; document.getElementById('register-form-wrap').style.display='none'; document.getElementById('login-mode-label').textContent='Respondent Portal';}
+function showRegister(){ document.getElementById('login-form-wrap').style.display='none'; document.getElementById('register-form-wrap').style.display='block'; }
+
+function doLogin(){
+  const u=document.getElementById('inp-user').value.trim();
+  const p=document.getElementById('inp-pass').value.trim();
+  if(!u||!p){ showErr('login-err','Please enter username and password.'); return; }
+  const users=getUsers();
+  // Auto-create if not exists (demo mode)
+  if(!users[u]){
+    users[u]={username:u,name:u,faculty:'ABU Zaria',level:'300L',password:p,surveys:[],likes:[],rated:{},comments:{},color:COLORS[Math.floor(Math.random()*COLORS.length)]};
+    saveUsers(users);
+  }
+  currentUser=users[u];
+  saveSession(currentUser);
+  enterDashboard();
+}
+
+function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const u=document.getElementById('reg-user').value.trim();
+  const fac=document.getElementById('reg-faculty').value;
+  const lvl=document.getElementById('reg-level').value;
+  const p=document.getElementById('reg-pass').value.trim();
+  if(!name||!u||!fac||!p){ showErr('reg-err','Please fill all fields.'); return; }
+  const users=getUsers();
+  if(users[u]){ showErr('reg-err','Username already taken. Choose another.'); return; }
+  users[u]={username:u,name,faculty:fac,level:lvl,password:p,surveys:[],likes:[],rated:{},comments:{},color:COLORS[Math.floor(Math.random()*COLORS.length)]};
+  saveUsers(users);
+  currentUser=users[u];
+  saveSession(currentUser);
+  enterDashboard();
+}
+
+function doLogout(){
+  currentUser=null;
+  localStorage.removeItem(SESSION_KEY);
+  document.getElementById('login-screen').classList.remove('out');
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('inp-user').value='';
+  document.getElementById('inp-pass').value='';
+  showLogin();
+}
+
+function showErr(id,msg){
+  const el=document.getElementById(id);
+  const msg_el=document.getElementById(id.replace('err','err')+'-msg')||el.querySelector('span');
+  if(msg_el) msg_el.textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+function enterDashboard(){
+  document.getElementById('login-screen').classList.add('out');
+  document.getElementById('dashboard').style.display='flex';
+  // Update UI with user info
+  const initials=(currentUser.name||currentUser.username).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('nav-av').textContent=initials;
+  document.getElementById('nav-av').style.background=currentUser.color;
+  document.getElementById('nav-name').textContent=currentUser.name||currentUser.username;
+  document.getElementById('nav-meta').textContent=(currentUser.faculty||'ABU Zaria')+' · '+(currentUser.level||'');
+  document.getElementById('sb-av-lg').textContent=initials;
+  document.getElementById('sb-av-lg').style.background=currentUser.color;
+  document.getElementById('sb-name').textContent=currentUser.name||currentUser.username;
+  document.getElementById('sb-meta').textContent=(currentUser.faculty||'ABU Zaria')+' · '+(currentUser.level||'');
+  document.getElementById('feed-greeting').textContent='Welcome back, '+(currentUser.name||currentUser.username).split(' ')[0]+' — research studies are waiting.';
+  updateSidebarCounts();
+  renderFeed();
+}
+
+// ══════════════ DATA ══════════════
+function getInteractions(){ try{return JSON.parse(localStorage.getItem(INTERACT_KEY))||{};}catch{return{};} }
+function saveInteractions(d){ localStorage.setItem(INTERACT_KEY,JSON.stringify(d)); }
+
+function getAllStudies(){
+  // Merge: researcher-posted studies first, then demo studies
+  let posted=[];
+  try{ posted=JSON.parse(localStorage.getItem(STORE_KEY))||[]; }catch{}
+  // Prevent demo duplicates
+  const postedIds=new Set(posted.map(s=>s.id));
+  // Enrich posted studies with researcher info
+  posted=posted.map(s=>({...s,researcher:'Prof. Sodiq',researcher_id:'prof_sodq',avatarColor:COLORS[0]}));
+  const demos=DEMO_STUDIES.filter(d=>!postedIds.has(d.id));
+  return [...posted,...demos];
+}
+
+// ══════════════ RENDER FEED ══════════════
+function renderFeed(){
+  let studies=getAllStudies();
+  if(currentFilter==='prof_sodq') studies=studies.filter(s=>s.researcher_id==='prof_sodq');
+  else if(currentFilter==='participated') studies=studies.filter(s=>(currentUser.surveys||[]).includes(s.id));
+  if(currentSort==='popular') studies.sort((a,b)=>(b.responses||0)-(a.responses||0));
+  else if(currentSort==='closing') studies.sort((a,b)=>((a.responses/a.target||0))-(b.responses/b.target||0));
+  else studies.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+
+  document.getElementById('sb-all-ct').textContent=getAllStudies().length;
+  updateSidebarCounts();
+
+  const container=document.getElementById('feed-container');
+  if(!studies.length){
+    container.innerHTML=`<div class="empty"><i class="fas fa-search"></i><h3>No Studies Found</h3><p>There are no studies matching this filter yet.</p></div>`;
+    return;
+  }
+  container.innerHTML=studies.map((s,i)=>buildCard(s,i===0&&s.researcher_id==='prof_sodq')).join('');
+}
+
+function buildCard(s,featured){
+  const ix=getInteractions();
+  const sid=s.id;
+  const likes=(ix[sid]?.likes||0);
+  const userLiked=(currentUser?.likes||[]).includes(sid);
+  const comments=(ix[sid]?.comments||[]);
+  const userRated=(currentUser?.rated||{})[sid]||0;
+  const avgRating=(ix[sid]?.totalRating&&ix[sid]?.raterCount)?(ix[sid].totalRating/ix[sid].raterCount):0;
+  const participated=(currentUser?.surveys||[]).includes(sid);
+  const prog=s.target?Math.min(Math.round((s.responses/s.target)*100),100):0;
+  const initials=(s.researcher||'R').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const stars=[1,2,3,4,5].map(n=>`<button class="star-btn ${n<=Math.round(userRated)?'filled':''}" onclick="rateStudy('${sid}',${n})" title="Rate ${n} star">★</button>`).join('');
+
+  return `<div class="feed-card ${featured?'featured':''}" id="fc-${sid}">
+    <div class="fc-header">
+      <div class="fc-av" style="background:${s.avatarColor||COLORS[0]}">${initials}</div>
+      <div class="fc-info">
+        <div class="fc-name">${s.researcher||'Researcher'}</div>
+        <div class="fc-meta">
+          <i class="fas fa-university"></i> ${s.department||'ABU Zaria'}
+          &bull; <i class="fas fa-clock"></i> ${s.duration||'—'}
+          &bull; <i class="fas fa-calendar-alt"></i> ${s.date||''}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0">
+        ${featured?'<div class="fc-featured-tag"><i class="fas fa-star"></i> Featured</div>':''}
+        <div class="fc-badge ${s.status==='Live'?'live':''}">
+          ${s.status==='Live'?'<i class="fas fa-circle" style="font-size:7px"></i>':''}${s.status}
+        </div>
+      </div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-category"><i class="fas fa-tag"></i> ${s.category||'Research'}</div>
+      <h3>${s.title}</h3>
+      <p>${s.description}</p>
+      <div class="fc-tags">
+        <span class="fc-tag"><i class="fas fa-graduation-cap"></i>${s.level||'All Levels'}</span>
+        <span class="fc-tag"><i class="fas fa-users"></i>Target: ${s.target||'Open'}</span>
+        ${participated?'<span class="fc-tag" style="background:#dcfce7;border-color:#86efac;color:#16a34a"><i class="fas fa-check-double"></i>Participated</span>':''}
+      </div>
+    </div>
+    <div class="fc-stats">
+      <div class="fc-stat"><strong>${s.responses||0}</strong><span>Responses</span></div>
+      <div class="fc-stat"><strong>${s.target||'—'}</strong><span>Target</span></div>
+      <div class="fc-stat"><strong>${avgRating>0?avgRating.toFixed(1):'—'}</strong><span>Rating</span></div>
+    </div>
+    ${s.target?`<div class="fc-prog">
+      <div class="prog-label"><span>Completion</span><span>${prog}%</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${prog}%"></div></div>
+    </div>`:''}
+    <div class="fc-rating">
+      <span class="rating-label"><i class="fas fa-star" style="color:var(--gold);margin-right:4px"></i>Rate this study:</span>
+      <div class="stars-wrap" id="stars-${sid}">${stars}</div>
+      <span class="rating-avg">${avgRating>0?avgRating.toFixed(1)+' ★':''}</span>
+      <span class="rating-count">${ix[sid]?.raterCount?'('+ix[sid].raterCount+' ratings)':''}</span>
+    </div>
+    <div class="fc-actions">
+      <button class="act-btn ${userLiked?'liked':''}" onclick="toggleLike('${sid}')">
+        <i class="fas fa-thumbs-up"></i> <span id="lk-${sid}">${likes}</span>
+      </button>
+      <button class="act-btn" onclick="toggleComments('${sid}')">
+        <i class="fas fa-comment-alt"></i> <span>${comments.length}</span>
+      </button>
+      <button class="act-btn" onclick="shareStudy('${sid}')">
+        <i class="fas fa-share-alt"></i> Share
+      </button>
+      <button class="act-btn fill ${participated?'done':''}" onclick="${participated?'':'openSurvey(\''+sid+'\')'}">
+        ${participated
+          ?'<i class="fas fa-check-circle"></i> Completed'
+          :'<i class="fas fa-pen-nib"></i> Fill Questionnaire'}
+      </button>
+    </div>
+    <div class="fc-comments">
+      <button class="comments-toggle" onclick="toggleComments('${sid}')">
+        <i class="fas fa-chevron-down" id="ct-ico-${sid}"></i>
+        <span>${comments.length} comment${comments.length===1?'':'s'} — click to ${document.getElementById('cmts-'+sid)?.classList.contains('open')?'hide':'view'}</span>
+      </button>
+      <div class="comments-inner" id="cmts-${sid}">
+        <div id="cmts-list-${sid}">
+          ${comments.length?comments.map(c=>buildComment(c)).join(''):'<p style="font-size:13px;color:var(--text-l);text-align:center;padding:10px 0">No comments yet. Be the first!</p>'}
+        </div>
+        <div class="comment-input-wrap">
+          <input class="cm-inp" id="cm-inp-${sid}" placeholder="Share your thoughts on this research..." onkeydown="if(event.key==='Enter')postComment('${sid}')">
+          <button class="cm-send" onclick="postComment('${sid}')"><i class="fas fa-paper-plane"></i> Post</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildComment(c){
+  const initials=(c.name||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  return `<div class="comment-item">
+    <div class="cm-av" style="background:${c.color||COLORS[0]}">${initials}</div>
+    <div class="cm-bubble">
+      <div class="cm-top"><strong>${c.name||'Anonymous'}</strong><time>${c.time||''}</time></div>
+      <p>${c.text}</p>
+    </div>
+  </div>`;
+}
+
+// ══════════════ INTERACTIONS ══════════════
+function toggleLike(sid){
+  if(!currentUser) return;
+  const ix=getInteractions();
+  if(!ix[sid]) ix[sid]={likes:0,comments:[],totalRating:0,raterCount:0};
+  const liked=(currentUser.likes||[]).includes(sid);
+  if(liked){
+    ix[sid].likes=Math.max(0,(ix[sid].likes||1)-1);
+    currentUser.likes=(currentUser.likes||[]).filter(l=>l!==sid);
+  } else {
+    ix[sid].likes=(ix[sid].likes||0)+1;
+    currentUser.likes=[...(currentUser.likes||[]),sid];
+  }
+  saveInteractions(ix);
+  saveCurrentUser();
+  // Update button without full re-render
+  const btn=document.querySelector(`#fc-${sid} .act-btn`);
+  const ct=document.getElementById('lk-'+sid);
+  if(btn) btn.classList.toggle('liked',!liked);
+  if(ct) ct.textContent=ix[sid].likes;
+  // Update researcher stats if it's prof_sodq study
+  syncResearcherStats(sid,ix[sid]);
+}
+
+function rateStudy(sid,val){
+  if(!currentUser) return;
+  const ix=getInteractions();
+  if(!ix[sid]) ix[sid]={likes:0,comments:[],totalRating:0,raterCount:0};
+  const prev=(currentUser.rated||{})[sid]||0;
+  if(prev>0){
+    ix[sid].totalRating=(ix[sid].totalRating||0)-prev+val;
+  } else {
+    ix[sid].totalRating=(ix[sid].totalRating||0)+val;
+    ix[sid].raterCount=(ix[sid].raterCount||0)+1;
+  }
+  currentUser.rated={...(currentUser.rated||{}),[sid]:val};
+  saveInteractions(ix);
+  saveCurrentUser();
+  // Re-render stars
+  const avg=ix[sid].totalRating/ix[sid].raterCount;
+  const starsWrap=document.getElementById('stars-'+sid);
+  if(starsWrap){
+    starsWrap.innerHTML=[1,2,3,4,5].map(n=>`<button class="star-btn ${n<=val?'filled':''}" onclick="rateStudy('${sid}',${n})">★</button>`).join('');
+  }
+  // Update avg display
+  const avgEl=starsWrap?.nextElementSibling;
+  const ctEl=avgEl?.nextElementSibling;
+  if(avgEl) avgEl.textContent=avg.toFixed(1)+' ★';
+  if(ctEl) ctEl.textContent='('+ix[sid].raterCount+' ratings)';
+  // Update stat card in feed
+  const statEl=document.querySelector(`#fc-${sid} .fc-stat:nth-child(3) strong`);
+  if(statEl) statEl.textContent=avg.toFixed(1);
+  showToast('Rating saved — thank you!');
+  syncResearcherStats(sid,ix[sid]);
+}
+
+function toggleComments(sid){
+  const box=document.getElementById('cmts-'+sid);
+  const ico=document.getElementById('ct-ico-'+sid);
+  if(!box) return;
+  const open=box.classList.toggle('open');
+  if(ico) ico.style.transform=open?'rotate(180deg)':'';
+}
+
+function postComment(sid){
+  if(!currentUser) return;
+  const inp=document.getElementById('cm-inp-'+sid);
+  const text=inp?.value.trim();
+  if(!text) return;
+  const ix=getInteractions();
+  if(!ix[sid]) ix[sid]={likes:0,comments:[],totalRating:0,raterCount:0};
+  const comment={name:currentUser.name||currentUser.username,text,time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' today',color:currentUser.color};
+  ix[sid].comments=[...(ix[sid].comments||[]),comment];
+  saveInteractions(ix);
+  inp.value='';
+  // Re-render comment list
+  const list=document.getElementById('cmts-list-'+sid);
+  if(list) list.innerHTML=ix[sid].comments.map(c=>buildComment(c)).join('');
+  // Update comment count button
+  const actions=document.querySelector(`#fc-${sid} .fc-actions .act-btn:nth-child(2) span`);
+  if(actions) actions.textContent=ix[sid].comments.length;
+  const toggle=document.querySelector(`#fc-${sid} .comments-toggle span`);
+  if(toggle) toggle.textContent=ix[sid].comments.length+' comment'+(ix[sid].comments.length===1?'':'s')+' — click to hide';
+  syncResearcherStats(sid,ix[sid]);
+  showToast('Comment posted!');
+}
+
+// ══════════════ SURVEY PARTICIPATION ══════════════
+function openSurvey(sid){
+  activeSurveyId=sid;
+  const all=getAllStudies();
+  const s=all.find(x=>x.id===sid);
+  if(!s) return;
+  document.getElementById('smodal-title').textContent=s.title;
+  document.getElementById('smodal-link').href=s.link;
+  document.getElementById('smodal-url').textContent=s.link;
+  document.getElementById('survey-modal').classList.add('open');
+}
+
+function markDone(){
+  if(!activeSurveyId||!currentUser) return;
+  if((currentUser.surveys||[]).includes(activeSurveyId)){ showToast('Already marked as completed.'); return; }
+  currentUser.surveys=[...(currentUser.surveys||[]),activeSurveyId];
+  saveCurrentUser();
+  // Bump response count in researcher's data
+  bumpResponse(activeSurveyId);
+  closeModal();
+  showToast('🎉 Marked as completed — thank you for contributing!');
+  setTimeout(()=>renderFeed(),400);
+  updateSidebarCounts();
+}
+
+function bumpResponse(sid){
+  // Only bump researcher-posted studies
+  let posted=[];
+  try{ posted=JSON.parse(localStorage.getItem(STORE_KEY))||[]; }catch{}
+  const idx=posted.findIndex(s=>s.id===sid);
+  if(idx>=0){
+    posted[idx].responses=(posted[idx].responses||0)+1;
+    localStorage.setItem(STORE_KEY,JSON.stringify(posted));
+  }
+}
+
+function syncResearcherStats(sid, ixData){
+  // Store interaction summary back so researcher dashboard can read it
+  const RDATA_KEY='abu_study_interactions';
+  let rd={};
+  try{ rd=JSON.parse(localStorage.getItem(RDATA_KEY))||{}; }catch{}
+  rd[sid]={likes:ixData.likes||0,comments:(ixData.comments||[]).length,avgRating:ixData.raterCount?(ixData.totalRating/ixData.raterCount).toFixed(1):null};
+  localStorage.setItem(RDATA_KEY,JSON.stringify(rd));
+}
+
+function shareStudy(sid){
+  const s=getAllStudies().find(x=>x.id===sid);
+  if(navigator.share&&s){
+    navigator.share({title:s.title,text:s.description,url:s.link}).catch(()=>{});
+  } else {
+    if(s) navigator.clipboard?.writeText(s.link).then(()=>showToast('Survey link copied!'));
+    else showToast('Link copied!');
+  }
+}
+
+// ══════════════ FILTER / SORT ══════════════
+function setFeedFilter(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderFeed();
+}
+
+function setSort(s,btn){
+  currentSort=s;
+  document.querySelectorAll('.flt-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderFeed();
+}
+
+// ══════════════ HELPERS ══════════════
+function saveCurrentUser(){
+  const users=getUsers();
+  users[currentUser.username]=currentUser;
+  saveUsers(users);
+  saveSession(currentUser);
+  updateSidebarCounts();
+}
+
+function updateSidebarCounts(){
+  if(!currentUser) return;
+  document.getElementById('sb-done').textContent=(currentUser.surveys||[]).length;
+  document.getElementById('sb-liked').textContent=(currentUser.likes||[]).length;
+  // Badges
+  const done=(currentUser.surveys||[]).length;
+  if(done>=1) document.getElementById('bdg-first').className='bdg-it gd';
+  if(done>=10) document.getElementById('bdg-active').className='bdg-it gr';
+  if(done>=50) document.getElementById('bdg-diamond').className='bdg-it sk';
+}
+
+function closeModal(){
+  document.querySelectorAll('.modal-overlay').forEach(o=>o.classList.remove('open'));
+}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+
+function showToast(msg,isErr){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.querySelector('i').style.color=isErr?'#FF6B6B':'var(--g300)';
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ══════════════ ENTER KEY ══════════════
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!document.getElementById('login-screen').classList.contains('out')){
+    const wrap=document.getElementById('register-form-wrap');
+    if(wrap.style.display==='none') doLogin(); else doRegister();
+  }
+});
+
+// ══════════════ AUTO-LOGIN ══════════════
+window.addEventListener('load',()=>{
+  const sess=getSession();
+  if(sess){ currentUser=sess; enterDashboard(); }
+});
+</script>
+</body>
+</html>

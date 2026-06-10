@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABU SmartSurvey — Researcher Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g900:#001A00;--g800:#002800;--g700:#003D00;--g600:#006400;
+  --g500:#008000;--g400:#22A722;--g300:#4DC94D;--g100:#E8F5E8;--g50:#F0F7F0;
+  --gold:#C8961A;--gold-l:#F0C040;--white:#FFFFFF;
+  --text:#1A2E1A;--text-m:#4A6B4A;--text-l:#7A9B7A;
+  --radius:16px;--card:#fff;--border:#ddefdd;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#f0f0f0}::-webkit-scrollbar-thumb{background:var(--g400);border-radius:3px}
+
+/* ── LOGIN SCREEN ── */
+#login-screen{position:fixed;inset:0;z-index:9999;background:var(--g900);display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .6s ease,visibility .6s ease}
+#login-screen.out{opacity:0;visibility:hidden;pointer-events:none}
+.login-wrap{width:100%;max-width:440px;animation:fadeUp .7s ease both}
+.login-logo{text-align:center;margin-bottom:36px}
+.login-crest{width:64px;height:64px;margin:0 auto 14px;filter:drop-shadow(0 0 14px rgba(0,180,0,.5))}
+.login-crest svg{width:100%;height:100%}
+.login-logo h1{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2}
+.login-logo p{font-size:13px;color:var(--g300);letter-spacing:1.5px;margin-top:4px;text-transform:uppercase}
+.login-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:36px;backdrop-filter:blur(20px)}
+.login-card h2{font-family:'Cinzel',serif;font-size:18px;color:#fff;margin-bottom:6px}
+.login-card .sub{font-size:13px;color:rgba(255,255,255,.45);margin-bottom:28px}
+.lf-group{margin-bottom:18px}
+.lf-group label{display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.lf-input{position:relative}
+.lf-input i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:14px}
+.lf-input input{width:100%;padding:13px 14px 13px 42px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .3s}
+.lf-input input::placeholder{color:rgba(255,255,255,.25)}
+.lf-input input:focus{border-color:var(--g400)}
+.lf-err{font-size:12px;color:#FF6B6B;margin-top:6px;display:none}
+.lf-err.show{display:block}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;transition:transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,100,0,.5)}
+.login-hint{text-align:center;margin-top:20px;font-size:12px;color:rgba(255,255,255,.3)}
+.login-hint span{color:var(--g300)}
+.login-back{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.35);text-decoration:none;font-size:13px;margin-bottom:24px;transition:color .2s}
+.login-back:hover{color:var(--g300)}
+
+/* ── DASHBOARD LAYOUT ── */
+#dashboard{display:none;min-height:100vh}
+#dashboard.active{display:flex;flex-direction:column}
+
+/* TOP NAV */
+.dash-nav{height:66px;background:var(--g900);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.3)}
+.dash-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.dash-logo-crest{width:36px;height:36px}
+.dash-logo-crest svg{width:100%;height:100%}
+.dash-logo span{font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:#fff}
+.dash-logo small{display:block;font-size:10px;color:var(--g300);letter-spacing:1.5px;text-transform:uppercase;font-family:'Inter',sans-serif;font-weight:400}
+.dash-nav-right{display:flex;align-items:center;gap:16px}
+.dash-notif{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);cursor:pointer;font-size:15px;position:relative;transition:background .2s}
+.dash-notif:hover{background:rgba(255,255,255,.12)}
+.dash-notif .badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:var(--gold);border-radius:50%;font-size:9px;color:var(--g900);font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--g900)}
+.dash-prof{display:flex;align-items:center;gap:10px;cursor:pointer}
+.dash-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--g600),var(--g400));display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:#fff}
+.dash-prof-info strong{display:block;font-size:13px;color:#fff;font-weight:600;line-height:1.2}
+.dash-prof-info span{font-size:11px;color:var(--g300)}
+.btn-logout{padding:8px 16px;background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);border-radius:8px;color:rgba(255,150,150,.9);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-logout:hover{background:rgba(255,80,80,.25);color:#fff}
+
+/* BODY LAYOUT */
+.dash-body{display:grid;grid-template-columns:250px 1fr;flex:1;min-height:0}
+
+/* SIDEBAR */
+.dash-sidebar{background:#fff;border-right:1px solid var(--border);padding:24px 0;display:flex;flex-direction:column;position:sticky;top:66px;height:calc(100vh - 66px);overflow-y:auto}
+.sidebar-section{padding:0 16px;margin-bottom:6px}
+.sidebar-label{font-size:10px;font-weight:700;color:var(--text-l);text-transform:uppercase;letter-spacing:1.5px;padding:12px 12px 6px}
+.sidebar-link{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:var(--text-m);text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
+.sidebar-link:hover{background:var(--g100);color:var(--g700)}
+.sidebar-link.active{background:var(--g100);color:var(--g700);font-weight:700}
+.sidebar-link.active i{color:var(--g600)}
+.sidebar-link i{width:18px;font-size:15px;color:var(--text-l);flex-shrink:0}
+.sidebar-link .s-badge{margin-left:auto;background:var(--g600);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+
+/* MAIN CONTENT */
+.dash-main{padding:32px;overflow-y:auto;background:var(--g50)}
+
+/* PAGE HEADER */
+.page-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+.page-hd h1{font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:var(--text)}
+.page-hd p{font-size:14px;color:var(--text-m);margin-top:4px}
+.btn-new{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 6px 20px rgba(0,100,0,.35);transition:transform .2s,box-shadow .2s}
+.btn-new:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,100,0,.45)}
+
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.sc{background:#fff;border-radius:var(--radius);padding:20px 22px;border:1px solid var(--border);transition:box-shadow .3s}
+.sc:hover{box-shadow:0 8px 24px rgba(0,100,0,.08)}
+.sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sc-ic{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.sc-ic.gr{background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff}
+.sc-ic.gd{background:linear-gradient(135deg,#C8961A,#F0C040);color:#fff}
+.sc-ic.bl{background:linear-gradient(135deg,#1A6BC8,#40A0F0);color:#fff}
+.sc-ic.pu{background:linear-gradient(135deg,#6B1AC8,#A040F0);color:#fff}
+.sc-trend{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px}
+.sc-trend.up{color:#16a34a;background:#dcfce7}
+.sc-trend.new{color:var(--g600);background:var(--g100)}
+.sc strong{display:block;font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:var(--text);line-height:1}
+.sc span{font-size:12px;color:var(--text-l);margin-top:4px;display:block}
+
+/* SURVEY CARDS */
+.surveys-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.sv-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;transition:transform .3s,box-shadow .3s}
+.sv-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,100,0,.1)}
+.sv-card-top{padding:20px 22px 16px;border-bottom:1px solid var(--border)}
+.sv-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sv-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:20px;background:var(--g100);color:var(--g700)}
+.sv-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
+.sv-status.live{background:#dcfce7;color:#16a34a}
+.sv-status.live::before{content:'';width:7px;height:7px;border-radius:50%;background:#16a34a;animation:pulse 1.5s infinite}
+.sv-status.pending{background:#fef9c3;color:#a16207}
+.sv-status.closed{background:#f3f4f6;color:#6b7280}
+.sv-card h3{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.35}
+.sv-card .sv-desc{font-size:13px;color:var(--text-m);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sv-card-mid{padding:14px 22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;background:var(--g50);border-bottom:1px solid var(--border)}
+.sv-mid-it{text-align:center}
+.sv-mid-it strong{display:block;font-size:16px;font-weight:700;color:var(--text)}
+.sv-mid-it span{font-size:10px;color:var(--text-l);text-transform:uppercase;letter-spacing:.5px}
+.sv-card-bot{padding:14px 22px;display:flex;align-items:center;gap:10px}
+.sv-author{display:flex;align-items:center;gap:8px;flex:1}
+.sv-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--g600),var(--g400));display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.sv-author-inf strong{font-size:12px;color:var(--text);font-weight:600}
+.sv-author-inf span{font-size:10px;color:var(--text-l);display:block}
+.btn-link{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none}
+.btn-link.pri{background:var(--g600);color:#fff}
+.btn-link.pri:hover{background:var(--g500)}
+.btn-link.sec{background:var(--g100);color:var(--g700)}
+.btn-link.sec:hover{background:var(--g100);color:var(--g900)}
+.btn-link.danger{background:#fee2e2;color:#dc2626}
+.btn-link.danger:hover{background:#fecaca}
+
+/* PROGRESS BAR */
+.sv-prog{padding:0 22px 14px}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text-l);margin-bottom:5px}
+.prog-bar{height:5px;background:#e5f0e5;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--g600),var(--g400));border-radius:3px;transition:width .5s ease}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all .35s}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;transform:translateY(30px);transition:transform .35s;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-hd{padding:26px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-hd h2{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--text)}
+.modal-hd p{font-size:13px;color:var(--text-m);margin-top:3px}
+.modal-close{width:36px;height:36px;border-radius:9px;border:none;background:var(--g50);cursor:pointer;font-size:15px;color:var(--text-m);transition:all .2s;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--g100);color:var(--text)}
+.modal-body{padding:24px 28px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--text-m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.form-group label span.req{color:#dc2626}
+.form-inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);background:#fff;outline:none;transition:border-color .3s}
+.form-inp:focus{border-color:var(--g500)}
+.form-inp::placeholder{color:var(--text-l)}
+textarea.form-inp{resize:vertical;min-height:90px;line-height:1.6}
+select.form-inp{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A9B7A' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-hint{font-size:11px;color:var(--text-l);margin-top:5px;display:flex;align-items:center;gap:5px}
+.form-hint i{color:var(--g400);font-size:11px}
+.link-preview{background:var(--g50);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-top:8px}
+.link-preview i{color:var(--g600);font-size:15px;flex-shrink:0}
+.link-preview a{font-size:12px;color:var(--g600);word-break:break-all;text-decoration:none}
+.link-preview a:hover{text-decoration:underline}
+.modal-foot{padding:16px 28px 24px;display:flex;align-items:center;justify-content:flex-end;gap:12px}
+.btn-cancel{padding:11px 22px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;color:var(--text-m);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-cancel:hover{border-color:var(--text-l);color:var(--text)}
+.btn-submit{padding:11px 26px;background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 15px rgba(0,100,0,.3)}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,100,0,.4)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--g900);color:#fff;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:9999;opacity:0;transform:translateY(20px);transition:all .4s;box-shadow:0 8px 30px rgba(0,0,0,.3);max-width:350px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast i{color:var(--g300);font-size:16px;flex-shrink:0}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;background:#fff;border-radius:var(--radius);border:1px dashed var(--border)}
+.empty i{font-size:44px;color:#c5ddc5;display:block;margin-bottom:16px}
+.empty h3{font-family:'Cinzel',serif;font-size:18px;color:var(--text);margin-bottom:8px}
+.empty p{font-size:14px;color:var(--text-m);max-width:360px;margin:0 auto 24px}
+
+/* SECTION NAV TABS */
+.view-tabs{display:flex;gap:4px;background:#fff;border-radius:12px;padding:4px;border:1px solid var(--border);margin-bottom:22px;width:fit-content}
+.view-tab{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text-m);font-family:'Inter',sans-serif;transition:all .2s;display:flex;align-items:center;gap:7px}
+.view-tab.on{background:var(--g600);color:#fff;box-shadow:0 3px 10px rgba(0,100,0,.3)}
+
+/* DELETE CONFIRM */
+.del-modal .modal{max-width:420px}
+.del-ic{width:60px;height:60px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;color:#dc2626}
+
+/* DETAIL MODAL */
+.detail-hero{background:linear-gradient(135deg,var(--g700),var(--g900));padding:28px;border-radius:14px;margin-bottom:20px;position:relative;overflow:hidden}
+.detail-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.04)}
+.detail-hero h3{font-family:'Cinzel',serif;font-size:18px;color:#fff;margin-bottom:8px;position:relative;z-index:1}
+.detail-hero p{font-size:13px;color:rgba(255,255,255,.55);line-height:1.7;position:relative;z-index:1}
+.detail-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.ds{background:var(--g50);border-radius:10px;padding:14px;text-align:center}
+.ds strong{display:block;font-family:'Cinzel',serif;font-size:20px;color:var(--g700)}
+.ds span{font-size:11px;color:var(--text-l);text-transform:uppercase;letter-spacing:.5px}
+.detail-link{background:var(--g50);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px}
+.dl-ic{width:42px;height:42px;border-radius:10px;background:var(--g600);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.dl-inf{flex:1;min-width:0}
+.dl-inf strong{display:block;font-size:13px;color:var(--text);font-weight:600;margin-bottom:3px}
+.dl-inf a{font-size:11px;color:var(--g600);text-decoration:none;word-break:break-all}
+.dl-inf a:hover{text-decoration:underline}
+.dl-btn{padding:8px 14px;background:var(--g600);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:6px;transition:background .2s;flex-shrink:0}
+.dl-btn:hover{background:var(--g500)}
+.info-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;margin:3px}
+.ic-cat{background:var(--g100);color:var(--g700)}
+.ic-dep{background:#e0f2fe;color:#0369a1}
+.ic-lvl{background:#faf5e4;color:#92400e}
+.ic-gen{background:#fce7f3;color:#9d174d}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .dash-body{grid-template-columns:1fr}
+  .dash-sidebar{display:none}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .form-row{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .dash-main{padding:20px}
+  .stat-row{grid-template-columns:1fr 1fr}
+  .page-hd{flex-direction:column}
+  .detail-stat-row{grid-template-columns:repeat(3,1fr)}
+  .dash-prof-info{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <a href="index.html" class="login-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    <div class="login-logo">
+      <div class="login-crest">
+        <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="color:#00AA00">
+          <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="6" fill="none"/>
+          <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="5" fill="none"/>
+          <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="4" fill="none"/>
+          <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="5" fill="none"/>
+          <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="3.5" fill="none"/>
+          <path d="M75 175 Q100 165 125 175" stroke="currentColor" stroke-width="3" fill="none"/>
+          <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="3" fill="none"/>
+          <circle cx="100" cy="95" r="4" stroke="currentColor" stroke-width="3" fill="none"/>
+        </svg>
+      </div>
+      <h1>ABU SmartSurvey</h1>
+      <p>Researcher Portal</p>
+    </div>
+    <div class="login-card">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to your researcher account to manage your studies.</p>
+      <div class="lf-group">
+        <label>Username</label>
+        <div class="lf-input">
+          <i class="fas fa-user"></i>
+          <input type="text" id="inp-user" placeholder="Enter your username" autocomplete="off">
+        </div>
+      </div>
+      <div class="lf-group">
+        <label>Password</label>
+        <div class="lf-input">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="inp-pass" placeholder="Enter your password" autocomplete="off">
+        </div>
+      </div>
+      <p class="lf-err" id="login-err"><i class="fas fa-exclamation-circle"></i> Incorrect username or password. Please try again.</p>
+      <button class="btn-login" onclick="doLogin()">
+        <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+      </button>
+      <p class="login-hint">Researcher account only &bull; Credentials: <span>prof_sodq / user123</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div id="dashboard">
+
+  <!-- TOP NAV -->
+  <nav class="dash-nav">
+    <a href="#" class="dash-logo">
+      <div class="dash-logo-crest">
+        <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="color:#00AA00">
+          <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="8" fill="none"/>
+          <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="6" fill="none"/>
+          <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="5" fill="none"/>
+          <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="5" fill="none"/>
+          <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="6" fill="none"/>
+          <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="5" fill="none"/>
+          <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="4" fill="none"/>
+          <circle cx="100" cy="95" r="4" stroke="currentColor" stroke-width="4" fill="none"/>
+        </svg>
+      </div>
+      <div>
+        <span>ABU SmartSurvey</span>
+        <small>Researcher Portal</small>
+      </div>
+    </a>
+    <div class="dash-nav-right">
+      <div class="dash-notif">
+        <i class="fas fa-bell"></i>
+        <div class="badge">2</div>
+      </div>
+      <div class="dash-prof">
+        <div class="dash-av">S</div>
+        <div class="dash-prof-info">
+          <strong>Prof. Sodiq</strong>
+          <span>ABU Zaria</span>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <!-- BODY -->
+  <div class="dash-body">
+
+    <!-- SIDEBAR -->
+    <aside class="dash-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Overview</div>
+        <button class="sidebar-link active" onclick="setView('timeline')">
+          <i class="fas fa-stream"></i> My Timeline
+          <span class="s-badge" id="sb-count">0</span>
+        </button>
+        <button class="sidebar-link" onclick="setView('analytics')">
+          <i class="fas fa-chart-bar"></i> Analytics
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Research</div>
+        <button class="sidebar-link" onclick="openNewModal()">
+          <i class="fas fa-plus-circle"></i> Post New Study
+        </button>
+        <button class="sidebar-link" onclick="setView('active')">
+          <i class="fas fa-satellite-dish"></i> Active Studies
+        </button>
+        <button class="sidebar-link" onclick="setView('closed')">
+          <i class="fas fa-archive"></i> Closed Studies
+        </button>
+      </div>
+      <div class="sidebar-section" style="margin-top:auto;padding-top:20px">
+        <div class="sidebar-label">Account</div>
+        <button class="sidebar-link">
+          <i class="fas fa-user-circle"></i> Profile
+        </button>
+        <button class="sidebar-link">
+          <i class="fas fa-cog"></i> Settings
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="dash-main" id="main-content">
+
+      <!-- === TIMELINE VIEW === -->
+      <div id="view-timeline">
+        <div class="page-hd">
+          <div>
+            <h1>Research Timeline</h1>
+            <p>All your posted research studies — visible to respondents.</p>
+          </div>
+          <button class="btn-new" onclick="openNewModal()">
+            <i class="fas fa-plus"></i> Post New Study
+          </button>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="stat-row">
+          <div class="sc">
+            <div class="sc-top">
+              <div class="sc-ic gr"><i class="fas fa-flask"></i></div>
+              <span class="sc-trend new" id="st-total-badge">Total</span>
+            </div>
+            <strong id="st-total">0</strong>
+            <span>Studies Posted</span>
+          </div>
+          <div class="sc">
+            <div class="sc-top">
+              <div class="sc-ic gd"><i class="fas fa-satellite-dish"></i></div>
+              <span class="sc-trend up" id="st-live-badge">Live</span>
+            </div>
+            <strong id="st-live">0</strong>
+            <span>Active Studies</span>
+          </div>
+          <div class="sc">
+            <div class="sc-top">
+              <div class="sc-ic bl"><i class="fas fa-users"></i></div>
+              <span class="sc-trend up">Responses</span>
+            </div>
+            <strong id="st-resp">0</strong>
+            <span>Total Responses</span>
+          </div>
+          <div class="sc">
+            <div class="sc-top">
+              <div class="sc-ic pu"><i class="fas fa-chart-pie"></i></div>
+              <span class="sc-trend up">Rate</span>
+            </div>
+            <strong id="st-rate">—</strong>
+            <span>Completion Rate</span>
+          </div>
+        </div>
+
+        <!-- FILTER TABS -->
+        <div class="view-tabs">
+          <button class="view-tab on" onclick="filterSurveys('all',this)"><i class="fas fa-th-large"></i> All</button>
+          <button class="view-tab" onclick="filterSurveys('Live',this)"><i class="fas fa-circle" style="font-size:8px;color:#16a34a"></i> Live</button>
+          <button class="view-tab" onclick="filterSurveys('Pending',this)"><i class="fas fa-clock"></i> Pending</button>
+          <button class="view-tab" onclick="filterSurveys('Closed',this)"><i class="fas fa-archive"></i> Closed</button>
+        </div>
+
+        <!-- SURVEY LIST -->
+        <div class="surveys-wrap" id="surveys-container"></div>
+        <div class="empty" id="empty-state" style="display:none">
+          <i class="fas fa-flask"></i>
+          <h3>No Studies Yet</h3>
+          <p>Post your first research study and start collecting data from verified respondents across Nigerian universities.</p>
+          <button class="btn-new" onclick="openNewModal()"><i class="fas fa-plus"></i> Post Your First Study</button>
+        </div>
+      </div>
+
+      <!-- === ANALYTICS VIEW === -->
+      <div id="view-analytics" style="display:none">
+        <div class="page-hd"><div><h1>Analytics</h1><p>Overview of your research activity.</p></div></div>
+        <div style="background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:40px;text-align:center">
+          <i class="fas fa-chart-bar" style="font-size:48px;color:#c5ddc5;display:block;margin-bottom:16px"></i>
+          <h3 style="font-family:'Cinzel',serif;color:var(--text);margin-bottom:8px">Analytics Coming Soon</h3>
+          <p style="color:var(--text-m);font-size:14px">Detailed response analytics and charts will appear here as your studies collect data.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════ POST STUDY MODAL ══════════════ -->
+<div class="modal-overlay" id="new-modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <h2>Post a New Research Study</h2>
+        <p>Fill in the details — respondents will see this on their timeline.</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('new-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Research Title <span class="req">*</span></label>
+        <input type="text" class="form-inp" id="f-title" placeholder="e.g. Impact of Social Media on Academic Performance Among Nigerian Undergraduates">
+        <p class="form-hint"><i class="fas fa-info-circle"></i> Make it clear and specific — this is the first thing respondents see.</p>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Research Category <span class="req">*</span></label>
+          <select class="form-inp" id="f-cat">
+            <option value="">— Select Category —</option>
+            <option>Social Sciences</option>
+            <option>Health & Medicine</option>
+            <option>Engineering & Technology</option>
+            <option>Agriculture & Environment</option>
+            <option>Education</option>
+            <option>Law & Governance</option>
+            <option>Economics & Business</option>
+            <option>Arts & Humanities</option>
+            <option>Pure Sciences</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Study Level</label>
+          <select class="form-inp" id="f-level">
+            <option value="All Levels">All Levels</option>
+            <option>Undergraduate (100L–500L)</option>
+            <option>Postgraduate (MSc/PhD)</option>
+            <option>Faculty Research</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Brief Description <span class="req">*</span></label>
+        <textarea class="form-inp" id="f-desc" placeholder="Describe what your research is about, what you're investigating, and why it matters. Keep it clear and engaging for potential respondents."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Target Department / Faculty</label>
+          <input type="text" class="form-inp" id="f-dept" placeholder="e.g. All Faculties, Faculty of Law...">
+        </div>
+        <div class="form-group">
+          <label>Target Respondents Needed</label>
+          <input type="number" class="form-inp" id="f-target" placeholder="e.g. 200" min="10" max="5000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Estimated Completion Time</label>
+        <select class="form-inp" id="f-time">
+          <option>5 minutes</option>
+          <option>10 minutes</option>
+          <option selected>15 minutes</option>
+          <option>20 minutes</option>
+          <option>30 minutes</option>
+          <option>45+ minutes</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Questionnaire Link <span class="req">*</span></label>
+        <input type="url" class="form-inp" id="f-link" value="https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog" placeholder="https://...">
+        <div class="link-preview" id="link-preview-box">
+          <i class="fas fa-link"></i>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog" target="_blank" id="link-preview-txt">Open questionnaire →</a>
+        </div>
+        <p class="form-hint"><i class="fas fa-shield-alt"></i> Google Forms, Typeform, SurveyMonkey, or any valid survey link accepted.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeModal('new-modal')">Cancel</button>
+      <button class="btn-submit" onclick="submitStudy()"><i class="fas fa-paper-plane"></i> Post to Timeline</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ VIEW DETAIL MODAL ══════════════ -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <h2>Study Details</h2>
+        <p>Full information about this research study.</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('detail-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeModal('detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DELETE CONFIRM MODAL ══════════════ -->
+<div class="modal-overlay del-modal" id="del-modal">
+  <div class="modal">
+    <div class="modal-body" style="padding:32px;text-align:center">
+      <div class="del-ic"><i class="fas fa-trash-alt"></i></div>
+      <h3 style="font-family:'Cinzel',serif;font-size:18px;color:var(--text);margin-bottom:10px">Delete This Study?</h3>
+      <p style="font-size:14px;color:var(--text-m);max-width:300px;margin:0 auto 28px;line-height:1.6">This will permanently remove the study from your timeline and respondents will no longer see it.</p>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="btn-cancel" onclick="closeModal('del-modal')">Cancel</button>
+        <button class="btn-link danger" style="padding:11px 22px;font-size:14px" id="confirm-del-btn"><i class="fas fa-trash-alt"></i> Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script>
+// ═══════════════ AUTH ═══════════════
+const CREDS = { username: 'prof_sodq', password: 'user123' };
+
+function doLogin() {
+  const u = document.getElementById('inp-user').value.trim();
+  const p = document.getElementById('inp-pass').value.trim();
+  const err = document.getElementById('login-err');
+  if (u === CREDS.username && p === CREDS.password) {
+    err.classList.remove('show');
+    document.getElementById('login-screen').classList.add('out');
+    document.getElementById('dashboard').classList.add('active');
+    renderSurveys();
+    updateStats();
+  } else {
+    err.classList.add('show');
+    document.getElementById('inp-pass').value = '';
+  }
+}
+
+function doLogout() {
+  document.getElementById('login-screen').classList.remove('out');
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pass').value = '';
+}
+
+// Enter key on login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !document.getElementById('login-screen').classList.contains('out')) doLogin();
+});
+
+// ═══════════════ DATA STORE ═══════════════
+const STORE_KEY = 'abu_smartsurvey_studies';
+function getStudies() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; }
+}
+function saveStudies(arr) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+}
+
+// ═══════════════ VIEWS ═══════════════
+function setView(v) {
+  document.getElementById('view-timeline').style.display = 'none';
+  document.getElementById('view-analytics').style.display = 'none';
+  const el = document.getElementById('view-' + v);
+  if (el) el.style.display = 'block';
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+}
+
+function filterSurveys(status, btn) {
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  renderSurveys(status === 'all' ? null : status);
+}
+
+// ═══════════════ RENDER ═══════════════
+const COLORS = ['linear-gradient(135deg,#006400,#22A722)','linear-gradient(135deg,#C8961A,#F0C040)','linear-gradient(135deg,#003D00,#008000)','linear-gradient(135deg,#1A4D1A,#4DC94D)','linear-gradient(135deg,#C8961A,#006400)'];
+
+function renderSurveys(filter) {
+  const container = document.getElementById('surveys-container');
+  const empty = document.getElementById('empty-state');
+  let studies = getStudies();
+  if (filter) studies = studies.filter(s => s.status === filter);
+
+  if (studies.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  container.innerHTML = studies.map((s, i) => {
+    const prog = s.target ? Math.min(Math.round((s.responses / s.target) * 100), 100) : 0;
+    const colIdx = i % COLORS.length;
+    const initials = s.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    return `
+    <div class="sv-card" id="card-${s.id}">
+      <div class="sv-card-top">
+        <div class="sv-meta">
+          <span class="sv-cat">${s.category || 'Research'}</span>
+          <span class="sv-status ${s.status === 'Live' ? 'live' : s.status === 'Pending' ? 'pending' : 'closed'}">${s.status}</span>
+        </div>
+        <h3>${s.title}</h3>
+        <p class="sv-desc">${s.description}</p>
+      </div>
+      <div class="sv-card-mid">
+        <div class="sv-mid-it"><strong>${s.responses}</strong><span>Responses</span></div>
+        <div class="sv-mid-it"><strong>${s.target || '—'}</strong><span>Target</span></div>
+        <div class="sv-mid-it"><strong>${s.duration}</strong><span>Duration</span></div>
+      </div>
+      ${s.target ? `<div class="sv-prog">
+        <div class="prog-label"><span>Progress</span><span>${prog}%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${prog}%"></div></div>
+      </div>` : ''}
+      <div class="sv-card-bot">
+        <div class="sv-author">
+          <div class="sv-av" style="background:${COLORS[colIdx]}">${initials}</div>
+          <div class="sv-author-inf"><strong>Prof. Sodiq</strong><span>ABU Zaria · ${s.date}</span></div>
+        </div>
+        <button class="btn-link sec" onclick="viewDetail('${s.id}')"><i class="fas fa-eye"></i></button>
+        <a href="${s.link}" target="_blank" class="btn-link pri"><i class="fas fa-external-link-alt"></i> Open</a>
+        <button class="btn-link danger" onclick="confirmDelete('${s.id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+  updateStats();
+}
+
+// ═══════════════ STATS ═══════════════
+function updateStats() {
+  const studies = getStudies();
+  const live = studies.filter(s => s.status === 'Live').length;
+  const totalResp = studies.reduce((a, s) => a + (s.responses || 0), 0);
+  const totalTarget = studies.reduce((a, s) => a + (s.target || 0), 0);
+  document.getElementById('st-total').textContent = studies.length;
+  document.getElementById('st-live').textContent = live;
+  document.getElementById('st-resp').textContent = totalResp;
+  document.getElementById('st-rate').textContent = totalTarget ? Math.round((totalResp / totalTarget) * 100) + '%' : '—';
+  document.getElementById('sb-count').textContent = studies.length;
+}
+
+// ═══════════════ POST STUDY ═══════════════
+function openNewModal() {
+  document.getElementById('new-modal').classList.add('open');
+}
+
+function submitStudy() {
+  const title = document.getElementById('f-title').value.trim();
+  const cat = document.getElementById('f-cat').value;
+  const desc = document.getElementById('f-desc').value.trim();
+  const link = document.getElementById('f-link').value.trim();
+
+  if (!title) { showToast('Please enter a research title.', true); return; }
+  if (!cat) { showToast('Please select a category.', true); return; }
+  if (!desc) { showToast('Please add a description.', true); return; }
+  if (!link) { showToast('Please add the questionnaire link.', true); return; }
+
+  const study = {
+    id: 'sv_' + Date.now(),
+    title,
+    category: cat,
+    description: desc,
+    department: document.getElementById('f-dept').value.trim() || 'All Departments',
+    target: parseInt(document.getElementById('f-target').value) || 0,
+    duration: document.getElementById('f-time').value,
+    link,
+    level: document.getElementById('f-level').value,
+    status: 'Live',
+    responses: 0,
+    date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+    timestamp: Date.now()
+  };
+
+  const studies = getStudies();
+  studies.unshift(study);
+  saveStudies(studies);
+
+  closeModal('new-modal');
+  clearForm();
+  renderSurveys();
+  showToast('Study posted to respondent timeline!');
+}
+
+function clearForm() {
+  ['f-title','f-desc','f-dept','f-target'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('f-cat').value = '';
+  document.getElementById('f-level').value = 'All Levels';
+  document.getElementById('f-time').value = '15 minutes';
+  document.getElementById('f-link').value = 'https://docs.google.com/forms/d/e/1FAIpQLScfiVP4hOjMgbl9PeD8EXheaYp1aIeS32hEk2duoN7i0cqEGg/viewform?usp=dialog';
+}
+
+// ═══════════════ DETAIL VIEW ═══════════════
+function viewDetail(id) {
+  const study = getStudies().find(s => s.id === id);
+  if (!study) return;
+  const prog = study.target ? Math.min(Math.round((study.responses / study.target) * 100), 100) : 0;
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-hero">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div>
+          <span class="sv-status ${study.status === 'Live' ? 'live' : study.status === 'Pending' ? 'pending' : 'closed'}" style="margin-bottom:12px;display:inline-flex">${study.status}</span>
+          <h3>${study.title}</h3>
+        </div>
+      </div>
+      <p style="margin-top:10px">${study.description}</p>
+      <div class="chips-wrap">
+        <span class="info-chip ic-cat"><i class="fas fa-tag"></i> ${study.category}</span>
+        ${study.department !== 'All Departments' ? `<span class="info-chip ic-dep"><i class="fas fa-university"></i> ${study.department}</span>` : ''}
+        <span class="info-chip ic-lvl"><i class="fas fa-graduation-cap"></i> ${study.level}</span>
+        <span class="info-chip ic-gen"><i class="fas fa-clock"></i> ${study.duration}</span>
+      </div>
+    </div>
+    <div class="detail-stat-row">
+      <div class="ds"><strong>${study.responses}</strong><span>Responses</span></div>
+      <div class="ds"><strong>${study.target || '—'}</strong><span>Target</span></div>
+      <div class="ds"><strong>${prog}%</strong><span>Progress</span></div>
+    </div>
+    ${study.target ? `<div style="margin-bottom:18px">
+      <div class="prog-label" style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-l);margin-bottom:6px"><span>Completion Progress</span><span>${prog}%</span></div>
+      <div class="prog-bar" style="height:8px;background:#e5f0e5;border-radius:4px;overflow:hidden"><div class="prog-fill" style="width:${prog}%;height:100%;background:linear-gradient(90deg,var(--g600),var(--g400));border-radius:4px"></div></div>
+    </div>` : ''}
+    <div class="detail-link">
+      <div class="dl-ic"><i class="fas fa-link"></i></div>
+      <div class="dl-inf">
+        <strong>Questionnaire Link</strong>
+        <a href="${study.link}" target="_blank">${study.link}</a>
+      </div>
+      <button class="dl-btn" onclick="window.open('${study.link}','_blank')"><i class="fas fa-external-link-alt"></i> Open</button>
+    </div>
+    <div style="margin-top:16px;font-size:12px;color:var(--text-l);display:flex;align-items:center;gap:8px">
+      <i class="fas fa-calendar-alt" style="color:var(--g400)"></i> Posted on ${study.date}
+    </div>`;
+
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+// ═══════════════ DELETE ═══════════════
+let pendingDeleteId = null;
+function confirmDelete(id) {
+  pendingDeleteId = id;
+  document.getElementById('del-modal').classList.add('open');
+}
+document.getElementById('confirm-del-btn').addEventListener('click', () => {
+  if (!pendingDeleteId) return;
+  const studies = getStudies().filter(s => s.id !== pendingDeleteId);
+  saveStudies(studies);
+  pendingDeleteId = null;
+  closeModal('del-modal');
+  renderSurveys();
+  showToast('Study removed from timeline.');
+});
+
+// ═══════════════ MODALS ═══════════════
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ═══════════════ LINK PREVIEW ═══════════════
+document.getElementById('f-link').addEventListener('input', function() {
+  const v = this.value.trim();
+  const box = document.getElementById('link-preview-box');
+  const txt = document.getElementById('link-preview-txt');
+  if (v) { box.style.display = 'flex'; txt.href = v; txt.textContent = 'Open questionnaire →'; }
+  else { box.style.display = 'none'; }
+});
+
+// ═══════════════ TOAST ═══════════════
+function showToast(msg, isErr) {
+  const t = document.getElementById('toast');
+  const tm = document.getElementById('toast-msg');
+  const ic = t.querySelector('i');
+  tm.textContent = msg;
+  ic.className = isErr ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+  ic.style.color = isErr ? '#FF6B6B' : 'var(--g300)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
