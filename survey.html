@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABU SmartSurvey — Research Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g900:#001A00;
+  --g800:#002800;
+  --g700:#003D00;
+  --g600:#006400;
+  --g500:#008000;
+  --g400:#22A722;
+  --g300:#4DC94D;
+  --g100:#E8F5E8;
+  --g50:#F0F7F0;
+  --gold:#C8961A;
+  --gold-l:#F0C040;
+  --gold-d:#8B6400;
+  --white:#FFFFFF;
+  --text:#1A2E1A;
+  --text-m:#4A6B4A;
+  --text-l:#7A9B7A;
+  --radius:16px;
+  --gap:100px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--white);color:var(--text);overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--g900)}
+::-webkit-scrollbar-thumb{background:var(--g600);border-radius:3px}
+
+/* PRELOADER */
+#preloader{position:fixed;inset:0;z-index:9999;background:var(--g900);display:flex;align-items:center;justify-content:center;transition:opacity .7s ease,visibility .7s ease}
+#preloader.hidden{opacity:0;visibility:hidden}
+.pre-crest{width:90px;height:90px;animation:preGlow 1.5s ease-in-out infinite}
+.pre-crest svg{width:100%;height:100%}
+.pre-text{color:rgba(255,255,255,.5);font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-align:center;margin-top:20px;animation:preFade 1.5s ease-in-out infinite}
+@keyframes preGlow{0%,100%{filter:drop-shadow(0 0 8px #00800066)}50%{filter:drop-shadow(0 0 24px #00800099)}}
+@keyframes preFade{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:72px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;transition:all .4s ease}
+nav.scrolled{background:rgba(0,26,0,.96);backdrop-filter:blur(20px);box-shadow:0 4px 30px rgba(0,0,0,.4)}
+.nav-logo{display:flex;align-items:center;gap:14px;text-decoration:none}
+.nav-crest{width:44px;height:44px;filter:drop-shadow(0 0 6px rgba(0,128,0,.6))}
+.nav-crest svg{width:100%;height:100%}
+.nav-txt strong{display:block;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:#fff;line-height:1.1}
+.nav-txt span{font-size:10px;color:var(--g300);letter-spacing:2px;text-transform:uppercase}
+.nav-links{display:flex;align-items:center;gap:30px;list-style:none}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:var(--gold);border-radius:1px;transform:scaleX(0);transition:transform .3s}
+.nav-links a:hover{color:#fff}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-btn{background:linear-gradient(135deg,var(--g600),var(--g500))!important;color:#fff!important;padding:9px 20px;border-radius:8px;font-weight:600!important;box-shadow:0 4px 15px rgba(0,100,0,.4);transition:transform .2s,box-shadow .2s!important}
+.nav-btn:hover{transform:translateY(-2px)!important;box-shadow:0 6px 20px rgba(0,100,0,.55)!important}
+.nav-btn::after{display:none!important}
+.nav-toggle{display:none;background:none;border:none;cursor:pointer;color:#fff;font-size:22px}
+.mob-menu{display:none;position:fixed;top:72px;left:0;right:0;background:rgba(0,26,0,.98);backdrop-filter:blur(20px);padding:20px 5%;flex-direction:column;z-index:999;border-top:1px solid rgba(255,255,255,.08)}
+.mob-menu.open{display:flex}
+.mob-menu a{color:rgba(255,255,255,.8);text-decoration:none;padding:14px 0;font-size:16px;font-weight:500;border-bottom:1px solid rgba(255,255,255,.07);transition:color .2s}
+.mob-menu a:hover{color:var(--g300)}
+
+/* HERO */
+#hero{min-height:100vh;background:var(--g900);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:100px 5% 60px;text-align:center}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-glow-a{position:absolute;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,100,0,.35) 0%,transparent 70%);pointer-events:none}
+.hero-glow-b{position:absolute;bottom:-200px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(200,150,26,.18) 0%,transparent 70%);pointer-events:none}
+.hero-crest-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(520px,80vw);opacity:.04;pointer-events:none;filter:drop-shadow(0 0 40px #00640066)}
+.hero-crest-bg svg{width:100%;height:100%}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,128,0,.15);border:1px solid rgba(0,128,0,.4);border-radius:50px;padding:8px 18px;margin-bottom:28px;position:relative;z-index:1;animation:fadeUp .8s ease both}
+.hero-badge i{color:var(--g300);font-size:12px}
+.hero-badge span{color:var(--g300);font-size:12px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase}
+.hero-title{font-family:'Cinzel',serif;font-size:clamp(36px,5.5vw,76px);font-weight:900;color:#fff;line-height:1.1;max-width:900px;margin-bottom:24px;position:relative;z-index:1;animation:fadeUp .8s ease .2s both}
+.hero-title .hi{display:block;background:linear-gradient(135deg,var(--g300),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.6);max-width:580px;margin:0 auto 44px;line-height:1.8;position:relative;z-index:1;animation:fadeUp .8s ease .35s both}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;animation:fadeUp .8s ease .5s both}
+.btn-p{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff;padding:16px 32px;border-radius:12px;text-decoration:none;font-size:15px;font-weight:600;box-shadow:0 8px 30px rgba(0,100,0,.5);transition:transform .25s,box-shadow .25s;border:none;cursor:pointer;position:relative;overflow:hidden}
+.btn-p::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);opacity:0;transition:opacity .3s}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,100,0,.6)}
+.btn-p:hover::before{opacity:1}
+.btn-s{display:inline-flex;align-items:center;gap:10px;background:transparent;color:#fff;padding:16px 32px;border-radius:12px;text-decoration:none;font-size:15px;font-weight:600;border:2px solid rgba(255,255,255,.25);transition:transform .25s,border-color .25s,background .25s;cursor:pointer}
+.btn-s:hover{transform:translateY(-3px);border-color:var(--g300);background:rgba(0,128,0,.1)}
+.hero-stats{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;margin-top:64px;padding-top:40px;border-top:1px solid rgba(255,255,255,.08);width:100%;max-width:720px;position:relative;z-index:1;animation:fadeUp .8s ease .7s both}
+.h-stat strong{display:block;font-family:'Cinzel',serif;font-size:34px;font-weight:700;background:linear-gradient(135deg,var(--g300),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.h-stat span{font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1.5px}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;animation:float 2s ease-in-out infinite;z-index:1}
+.scroll-hint span{color:rgba(255,255,255,.35);font-size:10px;letter-spacing:2px;text-transform:uppercase}
+.scroll-hint i{color:var(--g400);font-size:14px}
+
+/* SECTIONS */
+section{padding:var(--gap) 5%}
+.lbl{display:inline-flex;align-items:center;gap:8px;color:var(--g600);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+.lbl i{font-size:11px}
+.ttl{font-family:'Cinzel',serif;font-size:clamp(26px,3.5vw,44px);font-weight:700;line-height:1.2;color:var(--text);margin-bottom:16px}
+.ttl span{background:linear-gradient(135deg,var(--g600),var(--g400));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ttl-w{color:#fff!important}
+.sub{font-size:16px;color:var(--text-m);line-height:1.75;max-width:580px}
+.sub-w{color:rgba(255,255,255,.55)!important}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .75s ease,transform .75s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+
+/* HOW IT WORKS */
+#how{background:var(--g900)}
+#how .lbl{color:var(--g300)}
+.tab-bar{display:flex;gap:4px;background:rgba(255,255,255,.06);border-radius:14px;padding:5px;margin:40px 0 50px;width:fit-content}
+.tab-btn{padding:11px 28px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;color:rgba(255,255,255,.5);background:transparent;transition:all .3s;display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif}
+.tab-btn.on{background:linear-gradient(135deg,var(--g600),var(--g500));color:#fff;box-shadow:0 4px 15px rgba(0,100,0,.4)}
+.how-panel{display:none}
+.how-panel.on{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
+.how-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);padding:32px 28px;position:relative;overflow:hidden;transition:transform .3s,border-color .3s}
+.how-card:hover{transform:translateY(-6px);border-color:rgba(0,128,0,.4)}
+.how-num{font-family:'Cinzel',serif;font-size:52px;font-weight:900;color:rgba(0,128,0,.1);position:absolute;top:12px;right:18px;line-height:1}
+.how-ic{width:50px;height:50px;background:linear-gradient(135deg,rgba(0,100,0,.4),rgba(0,128,0,.2));border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:20px;color:var(--g300)}
+.how-card h4{font-family:'Cinzel',serif;font-size:16px;font-weight:600;color:#fff;margin-bottom:8px}
+.how-card p{font-size:14px;color:rgba(255,255,255,.45);line-height:1.65}
+
+/* FEATURES */
+#features{background:var(--g50)}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:26px;margin-top:56px}
+.feat-card{background:#fff;border-radius:var(--radius);padding:34px 30px;border:1px solid #ddefdd;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g600),var(--g300));transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.feat-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(0,100,0,.1);border-color:transparent}
+.feat-card:hover::before{transform:scaleX(1)}
+.feat-ic{width:54px;height:54px;background:linear-gradient(135deg,var(--g600),var(--g500));border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;color:#fff;font-size:21px;box-shadow:0 8px 20px rgba(0,100,0,.25)}
+.feat-card h3{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:10px}
+.feat-card p{font-size:14px;color:var(--text-m);line-height:1.7}
+.feat-tag{display:inline-flex;align-items:center;gap:6px;margin-top:18px;padding:5px 12px;background:var(--g100);border-radius:6px;font-size:11px;font-weight:700;color:var(--g700);text-transform:uppercase;letter-spacing:.5px}
+
+/* STATS */
+#stats{background:linear-gradient(135deg,var(--g700) 0%,var(--g900) 100%);padding:80px 5%}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px}
+.stat-it{text-align:center}
+.stat-ic{font-size:26px;color:rgba(255,255,255,.2);margin-bottom:14px;display:block}
+.stat-n{font-family:'Cinzel',serif;font-size:clamp(32px,4vw,52px);font-weight:900;color:#fff;display:block;margin-bottom:8px;line-height:1}
+.stat-lb{color:rgba(255,255,255,.55);font-size:13px;text-transform:uppercase;letter-spacing:1.5px}
+
+/* ABOUT */
+#about{background:#fff;overflow:hidden}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-vis{position:relative;display:flex;align-items:center;justify-content:center}
+.about-main{width:100%;max-width:480px;border-radius:24px;overflow:hidden;aspect-ratio:4/3;background:linear-gradient(135deg,var(--g800),var(--g600));display:flex;align-items:center;justify-content:center;box-shadow:0 30px 80px rgba(0,60,0,.2);position:relative}
+.about-dots{position:absolute;inset:0;opacity:.08;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:28px 28px}
+.about-inner{position:relative;text-align:center;color:#fff;padding:40px}
+.about-inner .crest-lg{width:80px;height:80px;margin:0 auto 20px;filter:drop-shadow(0 0 15px rgba(255,255,255,.3))}
+.about-inner .crest-lg svg{width:100%;height:100%}
+.about-inner h3{font-family:'Cinzel',serif;font-size:20px;margin-bottom:8px}
+.about-inner p{font-size:12px;color:rgba(255,255,255,.65);line-height:1.7}
+.about-float{position:absolute;bottom:-20px;right:-20px;background:#fff;border-radius:16px;padding:16px 20px;box-shadow:0 20px 50px rgba(0,0,0,.12);display:flex;align-items:center;gap:12px;animation:float 3s ease-in-out infinite}
+.af-ic{width:42px;height:42px;background:linear-gradient(135deg,var(--g600),var(--g500));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+.af strong{display:block;font-size:18px;color:var(--text);font-weight:700}
+.af span{font-size:11px;color:var(--text-l)}
+.about-pillars{display:flex;flex-direction:column;gap:18px;margin-top:32px}
+.pillar{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;background:var(--g50);border-radius:12px;border-left:4px solid var(--g500);transition:transform .3s}
+.pillar:hover{transform:translateX(6px)}
+.pillar i{color:var(--g600);font-size:19px;margin-top:2px;flex-shrink:0}
+.pillar h4{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.pillar p{font-size:13px;color:var(--text-m)}
+
+/* GALLERY */
+#gallery{background:var(--g900);padding-bottom:80px}
+#gallery .lbl{color:var(--g300)}
+.gal-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:240px 240px;gap:14px;margin-top:48px}
+.gal-it{border-radius:16px;overflow:hidden;position:relative;cursor:pointer}
+.gal-it:first-child{grid-row:1/3}
+.gal-bg{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative;overflow:hidden}
+.gal-bg::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,60,0,.7),rgba(0,20,0,.8))}
+.gal-it:nth-child(1) .gal-bg{background:var(--g700)}
+.gal-it:nth-child(2) .gal-bg{background:var(--g800)}
+.gal-it:nth-child(3) .gal-bg{background:#1A4D1A}
+.gal-it:nth-child(4) .gal-bg{background:#0D3B0D}
+.gal-it:nth-child(5) .gal-bg{background:#003D1A}
+.gal-ic{font-size:36px;color:rgba(255,255,255,.3);position:relative;z-index:1}
+.gal-tx{font-size:12px;font-weight:600;color:rgba(255,255,255,.3);position:relative;z-index:1;letter-spacing:1px;text-transform:uppercase}
+.gal-ov{position:absolute;inset:0;background:rgba(0,30,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+.gal-it:hover .gal-ov{opacity:1}
+.gal-ov i{font-size:28px;color:var(--g300);margin-bottom:10px}
+.gal-ov span{font-size:13px;color:rgba(255,255,255,.8);font-weight:600}
+
+/* COMMUNITY */
+#community{background:#fff}
+.comm-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.lboard{background:var(--g900);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,30,0,.15)}
+.lb-hd{background:linear-gradient(135deg,var(--g700),var(--g900));padding:20px 24px;display:flex;align-items:center;gap:12px}
+.lb-hd i{color:var(--gold-l);font-size:20px}
+.lb-hd h3{color:#fff;font-family:'Cinzel',serif;font-size:16px}
+.lb-row{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s}
+.lb-row:hover{background:rgba(255,255,255,.03)}
+.lb-rk{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.rk-g{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:var(--g900)}
+.rk-s{background:linear-gradient(135deg,#9CA3AF,#D1D5DB);color:var(--text)}
+.rk-b{background:linear-gradient(135deg,#B45309,#F59E0B);color:#fff}
+.rk-o{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}
+.lb-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.lb-inf{flex:1}
+.lb-inf strong{display:block;font-size:13px;color:#fff;font-weight:600}
+.lb-inf span{font-size:11px;color:rgba(255,255,255,.4)}
+.lb-ct{display:flex;align-items:center;gap:5px;color:var(--g300);font-size:13px;font-weight:700}
+.lb-ct i{font-size:11px}
+.badges-wrap{margin-top:40px}
+.badges-wrap h3{font-family:'Cinzel',serif;font-size:22px;color:var(--text);margin-bottom:18px}
+.bdg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.bdg{background:var(--g50);border-radius:14px;padding:18px 14px;text-align:center;border:2px solid transparent;transition:all .3s}
+.bdg:hover{border-color:var(--g500);transform:translateY(-4px);background:#fff;box-shadow:0 10px 30px rgba(0,100,0,.1)}
+.bdg i{font-size:26px;margin-bottom:9px;display:block}
+.bdg.gd i{color:var(--gold)}
+.bdg.gr i{color:var(--g600)}
+.bdg.sk i{color:var(--g400)}
+.bdg strong{display:block;font-size:12px;color:var(--text);font-weight:700;margin-bottom:3px}
+.bdg span{font-size:10px;color:var(--text-l)}
+
+/* TESTIMONIALS */
+#testimonials{background:var(--g50)}
+.testi-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:52px;flex-wrap:wrap;gap:20px}
+.t-slider{position:relative;overflow:hidden}
+.t-track{display:flex;gap:26px;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.t-card{background:#fff;border-radius:var(--radius);padding:34px;flex:0 0 calc(33.33% - 18px);border:1px solid #ddefdd;transition:transform .3s,box-shadow .3s}
+.t-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(0,100,0,.1)}
+.t-qi{width:38px;height:38px;background:linear-gradient(135deg,var(--g600),var(--g500));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;margin-bottom:20px}
+.t-stars{display:flex;gap:4px;margin-bottom:14px}
+.t-stars i{color:var(--gold);font-size:13px}
+.t-txt{font-size:14px;color:var(--text-m);line-height:1.8;margin-bottom:26px;font-style:italic}
+.t-auth{display:flex;align-items:center;gap:12px}
+.t-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:#fff;flex-shrink:0}
+.t-ai strong{display:block;font-size:14px;font-weight:700;color:var(--text)}
+.t-ai span{font-size:12px;color:var(--text-l)}
+.t-ctrls{display:flex;gap:10px;margin-top:32px;justify-content:center}
+.t-btn{width:42px;height:42px;border-radius:50%;border:2px solid #ddefdd;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:14px;transition:all .3s}
+.t-btn:hover{background:var(--g600);border-color:var(--g600);color:#fff;transform:scale(1.1)}
+.t-dots{display:flex;gap:7px;align-items:center;margin-top:20px;justify-content:center}
+.t-dot{width:8px;height:8px;border-radius:4px;background:#c5ddc5;transition:all .3s;cursor:pointer}
+.t-dot.on{width:22px;background:var(--g600)}
+
+/* CTA */
+#cta{background:var(--g900);text-align:center;padding:100px 5%;position:relative;overflow:hidden}
+#cta::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(0,100,0,.2) 0%,transparent 65%);pointer-events:none}
+.cta-in{position:relative;max-width:700px;margin:0 auto}
+#cta .lbl{color:var(--g300);justify-content:center}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+
+/* FOOTER */
+footer{background:#000D00;padding:80px 5% 0;color:rgba(255,255,255,.5)}
+.ft-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:56px;padding-bottom:56px;border-bottom:1px solid rgba(255,255,255,.07)}
+.ft-brand p{font-size:14px;line-height:1.8;margin:18px 0 24px;max-width:290px}
+.ft-soc{display:flex;gap:10px}
+.ft-sl{width:37px;height:37px;border-radius:10px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.45);font-size:14px;transition:all .3s;text-decoration:none;border:1px solid rgba(255,255,255,.08)}
+.ft-sl:hover{background:var(--g600);color:#fff;border-color:var(--g600);transform:translateY(-3px)}
+.ft-col h4{color:#fff;font-size:14px;font-weight:700;margin-bottom:18px;font-family:'Cinzel',serif}
+.ft-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.ft-col ul li a{color:rgba(255,255,255,.45);text-decoration:none;font-size:13px;transition:color .2s;display:flex;align-items:center;gap:7px}
+.ft-col ul li a:hover{color:var(--g300)}
+.ft-col ul li a i{font-size:10px;opacity:.5}
+.ft-news{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:26px;margin-top:8px}
+.ft-news p{font-size:13px;margin-bottom:14px;color:rgba(255,255,255,.6)}
+.nl-form{display:flex;gap:8px}
+.nl-form input{flex:1;padding:11px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#fff;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .3s}
+.nl-form input::placeholder{color:rgba(255,255,255,.25)}
+.nl-form input:focus{border-color:var(--g500)}
+.nl-form button{padding:11px 18px;background:var(--g600);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:background .3s;white-space:nowrap;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:7px}
+.nl-form button:hover{background:var(--g500)}
+.ft-btm{padding:26px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.ft-btm p{font-size:12px}
+.ft-btm a{color:var(--g300);text-decoration:none}
+.ft-btl{display:flex;gap:22px}
+.ft-btl a{color:rgba(255,255,255,.4);text-decoration:none;font-size:12px;transition:color .2s}
+.ft-btl a:hover{color:var(--g300)}
+
+/* BACK TOP */
+#btt{position:fixed;bottom:28px;right:28px;width:46px;height:46px;border-radius:13px;background:var(--g600);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 8px 25px rgba(0,100,0,.4);opacity:0;transform:translateY(20px);transition:opacity .3s,transform .3s;z-index:500}
+#btt.vis{opacity:1;transform:translateY(0)}
+#btt:hover{background:var(--g500);transform:translateY(-3px)}
+
+/* KEYFRAMES */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .about-grid,.comm-grid{grid-template-columns:1fr;gap:50px}
+  .about-vis{max-width:460px;margin:0 auto}
+  .ft-top{grid-template-columns:1fr 1fr;gap:36px}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:28px}
+  .t-card{flex:0 0 calc(50% - 13px)}
+  .gal-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .gal-it:first-child{grid-row:auto}
+}
+@media(max-width:768px){
+  :root{--gap:70px}
+  .nav-links,.nav-btn-li{display:none}
+  .nav-toggle{display:block}
+  .how-panel.on{grid-template-columns:1fr}
+  .bdg-grid{grid-template-columns:repeat(2,1fr)}
+  .ft-top{grid-template-columns:1fr;gap:30px}
+  .ft-btm{flex-direction:column;align-items:flex-start}
+  .t-card{flex:0 0 100%}
+  .gal-grid{grid-template-columns:1fr;height:auto}
+  .gal-it{height:180px}
+  .gal-it:first-child{height:240px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-btns{flex-direction:column;align-items:center}
+  .btn-p,.btn-s{width:100%;max-width:310px;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div style="text-align:center">
+    <div class="pre-crest">
+      <svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="#00AA00" stroke-width="5" fill="none"/>
+        <circle cx="100" cy="20" r="8" stroke="#00AA00" stroke-width="4" fill="none"/>
+        <circle cx="30" cy="195" r="7" stroke="#00AA00" stroke-width="3.5" fill="none"/>
+        <circle cx="170" cy="195" r="7" stroke="#00AA00" stroke-width="3.5" fill="none"/>
+        <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="#00AA00" stroke-width="4" fill="none"/>
+        <path d="M60 130 Q100 110 140 130" stroke="#00AA00" stroke-width="3.5" fill="none"/>
+        <path d="M65 155 Q100 140 135 155" stroke="#00AA00" stroke-width="3" fill="none"/>
+        <path d="M75 175 Q100 165 125 175" stroke="#00AA00" stroke-width="2.5" fill="none"/>
+        <path d="M85 60 Q100 40 115 60" stroke="#00AA00" stroke-width="3" fill="none"/>
+        <path d="M90 48 L100 35 L110 48" stroke="#00AA00" stroke-width="2.5" fill="none"/>
+        <circle cx="100" cy="95" r="4" stroke="#00AA00" stroke-width="2.5" fill="none"/>
+      </svg>
+    </div>
+    <p class="pre-text">ABU SMARTSURVEY</p>
+  </div>
+</div>
+
+<!-- CREST SVG TEMPLATE (reused) -->
+<svg id="crest-tpl" style="display:none" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+  <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="5" fill="none"/>
+  <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="4" fill="none"/>
+  <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="3.5" fill="none"/>
+  <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="3.5" fill="none"/>
+  <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="4" fill="none"/>
+  <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="3.5" fill="none"/>
+  <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="3" fill="none"/>
+  <path d="M75 175 Q100 165 125 175" stroke="currentColor" stroke-width="2.5" fill="none"/>
+  <path d="M85 60 Q100 40 115 60" stroke="currentColor" stroke-width="3" fill="none"/>
+  <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="2.5" fill="none"/>
+  <circle cx="100" cy="95" r="4" stroke="currentColor" stroke-width="2.5" fill="none"/>
+</svg>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <div class="nav-crest">
+      <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="color:#00AA00">
+        <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="8" fill="none"/>
+        <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="6" fill="none"/>
+        <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="5" fill="none"/>
+        <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="5" fill="none"/>
+        <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="6" fill="none"/>
+        <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="5" fill="none"/>
+        <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="4" fill="none"/>
+        <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="4" fill="none"/>
+        <circle cx="100" cy="95" r="4" stroke="currentColor" stroke-width="4" fill="none"/>
+      </svg>
+    </div>
+    <div class="nav-txt">
+      <strong>ABU SmartSurvey</strong>
+      <span>Research Platform</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="#testimonials">Testimonials</a></li>
+    <li class="nav-btn-li"><a href="#cta" class="nav-btn">Get Started</a></li>
+  </ul>
+  <button class="nav-toggle" id="navToggle"><i class="fas fa-bars"></i></button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mobMenu">
+  <a href="#how" onclick="closeMob()">How It Works</a>
+  <a href="#features" onclick="closeMob()">Features</a>
+  <a href="#about" onclick="closeMob()">About</a>
+  <a href="#community" onclick="closeMob()">Community</a>
+  <a href="#testimonials" onclick="closeMob()">Testimonials</a>
+  <a href="#cta" onclick="closeMob()" style="color:var(--g300)">Get Started</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-glow-a"></div>
+  <div class="hero-glow-b"></div>
+  <div class="hero-crest-bg">
+    <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="color:#008000">
+      <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="4" fill="none"/>
+      <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="3" fill="none"/>
+      <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="3" fill="none"/>
+      <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="3" fill="none"/>
+      <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="4" fill="none"/>
+      <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="3" fill="none"/>
+      <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="2.5" fill="none"/>
+      <path d="M75 175 Q100 165 125 175" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M85 60 Q100 40 115 60" stroke="currentColor" stroke-width="2.5" fill="none"/>
+      <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="2" fill="none"/>
+      <circle cx="100" cy="95" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="hero-badge">
+    <i class="fas fa-circle-dot"></i>
+    <span>Ahmadu Bello University &bull; Zaria, Nigeria</span>
+  </div>
+  <h1 class="hero-title">
+    Built for Academic<br><span class="hi">Research Excellence</span>
+  </h1>
+  <p class="hero-sub">Helping researchers collect fast, reliable, and high-quality data through a verified network of research participants across Nigerian universities.</p>
+  <div class="hero-btns">
+    <a href="#cta" class="btn-p"><i class="fas fa-flask"></i> Start a Research Project</a>
+    <a href="#cta" class="btn-s"><i class="fas fa-user-graduate"></i> Join as Respondent</a>
+  </div>
+  <div class="hero-stats">
+    <div class="h-stat"><strong><span class="cnt" data-t="1200">0</span>+</strong><span>Researchers</span></div>
+    <div class="h-stat"><strong><span class="cnt" data-t="8500">0</span>+</strong><span>Participants</span></div>
+    <div class="h-stat"><strong><span class="cnt" data-t="340">0</span>+</strong><span>Studies Done</span></div>
+    <div class="h-stat"><strong><span class="cnt" data-t="12">0</span>+</strong><span>Universities</span></div>
+  </div>
+  <div class="scroll-hint"><span>Scroll Down</span><i class="fas fa-chevron-down"></i></div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="reveal">
+    <div class="lbl"><i class="fas fa-route"></i> The Process</div>
+    <h2 class="ttl ttl-w">How ABU SmartSurvey <span>Works</span></h2>
+    <p class="sub sub-w">A simple, structured process whether you're conducting research or contributing to it.</p>
+  </div>
+  <div class="tab-bar reveal" style="margin-top:38px">
+    <button class="tab-btn on" onclick="switchTab('r')"><i class="fas fa-microscope"></i> For Researchers</button>
+    <button class="tab-btn" onclick="switchTab('p')"><i class="fas fa-user-graduate"></i> For Participants</button>
+  </div>
+  <div id="panel-r" class="how-panel on reveal">
+    <div class="how-card"><div class="how-num">01</div><div class="how-ic"><i class="fas fa-file-alt"></i></div><h4>Submit Survey</h4><p>Create your survey request with title, description, link, category, and target criteria for admin review.</p></div>
+    <div class="how-card"><div class="how-num">02</div><div class="how-ic"><i class="fas fa-sliders-h"></i></div><h4>Target Your Audience</h4><p>Narrow down respondents by university, faculty, department, academic level, gender, and age range.</p></div>
+    <div class="how-card"><div class="how-num">03</div><div class="how-ic"><i class="fas fa-satellite-dish"></i></div><h4>Reach Respondents</h4><p>Your approved survey is distributed to matched, verified participants who meet your exact criteria.</p></div>
+    <div class="how-card"><div class="how-num">04</div><div class="how-ic"><i class="fas fa-chart-bar"></i></div><h4>Collect Data</h4><p>Monitor responses in real-time on your dashboard and track participation analytics instantly.</p></div>
+  </div>
+  <div id="panel-p" class="how-panel reveal">
+    <div class="how-card"><div class="how-num">01</div><div class="how-ic"><i class="fas fa-id-badge"></i></div><h4>Create Profile</h4><p>Set up your academic profile with your university, faculty, department, level, and research interests.</p></div>
+    <div class="how-card"><div class="how-num">02</div><div class="how-ic"><i class="fas fa-bell"></i></div><h4>Receive Studies</h4><p>Get notified about research studies that match your academic profile and interests automatically.</p></div>
+    <div class="how-card"><div class="how-num">03</div><div class="how-ic"><i class="fas fa-pen-nib"></i></div><h4>Participate</h4><p>Complete surveys at your own pace and contribute meaningfully to advancing academic knowledge.</p></div>
+    <div class="how-card"><div class="how-num">04</div><div class="how-ic"><i class="fas fa-award"></i></div><h4>Build Your Record</h4><p>Earn badges, climb the leaderboard, and build a verified research contribution portfolio.</p></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="reveal" style="text-align:center;max-width:600px;margin:0 auto">
+    <div class="lbl" style="justify-content:center"><i class="fas fa-star"></i> Platform Features</div>
+    <h2 class="ttl" style="text-align:center">Everything You Need for <span>Research Success</span></h2>
+    <p class="sub" style="margin:0 auto">Powerful tools built specifically for academic research in the Nigerian university ecosystem.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card reveal"><div class="feat-ic"><i class="fas fa-crosshairs"></i></div><h3>Targeted Respondents</h3><p>Reach exactly the right participants with precision filters — university, faculty, department, level, age, and gender.</p><div class="feat-tag"><i class="fas fa-check-circle"></i> Verified Profiles</div></div>
+    <div class="feat-card reveal" style="transition-delay:.1s"><div class="feat-ic"><i class="fas fa-bolt"></i></div><h3>Faster Data Collection</h3><p>Reduce weeks of recruitment to hours. Our active participant network means your surveys get completed rapidly.</p><div class="feat-tag"><i class="fas fa-check-circle"></i> Speed Optimized</div></div>
+    <div class="feat-card reveal" style="transition-delay:.2s"><div class="feat-ic"><i class="fas fa-shield-alt"></i></div><h3>Better Response Quality</h3><p>Verified academic profiles and admin-moderated surveys ensure your data comes from legitimate, engaged participants.</p><div class="feat-tag"><i class="fas fa-check-circle"></i> Quality Assured</div></div>
+    <div class="feat-card reveal" style="transition-delay:.3s"><div class="feat-ic"><i class="fas fa-users"></i></div><h3>Research Community</h3><p>Join a growing network of researchers and students passionate about advancing academic knowledge across Nigeria.</p><div class="feat-tag"><i class="fas fa-check-circle"></i> Active Network</div></div>
+    <div class="feat-card reveal" style="transition-delay:.4s"><div class="feat-ic"><i class="fas fa-chart-line"></i></div><h3>Analytics Dashboard</h3><p>Real-time insights into your survey performance — track participants reached, response rates, and survey status.</p><div class="feat-tag"><i class="fas fa-check-circle"></i> Real-time Data</div></div>
+    <div class="feat-card reveal" style="transition-delay:.5s"><div class="feat-ic"><i class="fas fa-graduation-cap"></i></div><h3>Academic Research Support</h3><p>Built for undergraduate, postgraduate, and faculty research projects with workflows tailored to academic needs.</p><div class="feat-tag"><i class="fas fa-check-circle"></i> Academic Focus</div></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="stats-grid">
+    <div class="stat-it reveal"><i class="fas fa-users stat-ic"></i><span class="stat-n"><span class="cnt-s" data-t="8500">0</span>+</span><div class="stat-lb">Active Participants</div></div>
+    <div class="stat-it reveal" style="transition-delay:.1s"><i class="fas fa-flask stat-ic"></i><span class="stat-n"><span class="cnt-s" data-t="340">0</span>+</span><div class="stat-lb">Studies Conducted</div></div>
+    <div class="stat-it reveal" style="transition-delay:.2s"><i class="fas fa-university stat-ic"></i><span class="stat-n"><span class="cnt-s" data-t="12">0</span>+</span><div class="stat-lb">Universities Connected</div></div>
+    <div class="stat-it reveal" style="transition-delay:.3s"><i class="fas fa-check-double stat-ic"></i><span class="stat-n"><span class="cnt-s" data-t="94">0</span>%</span><div class="stat-lb">Data Quality Rate</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-vis reveal">
+      <div class="about-main">
+        <div class="about-dots"></div>
+        <div class="about-inner">
+          <div class="crest-lg">
+            <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="color:rgba(255,255,255,0.85)">
+              <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="6" fill="none"/>
+              <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="5" fill="none"/>
+              <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="4" fill="none"/>
+              <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="4" fill="none"/>
+              <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="5" fill="none"/>
+              <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="4" fill="none"/>
+              <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="3.5" fill="none"/>
+              <path d="M75 175 Q100 165 125 175" stroke="currentColor" stroke-width="3" fill="none"/>
+              <path d="M85 60 Q100 40 115 60" stroke="currentColor" stroke-width="3" fill="none"/>
+              <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="3" fill="none"/>
+              <circle cx="100" cy="95" r="5" stroke="currentColor" stroke-width="3" fill="none"/>
+            </svg>
+          </div>
+          <h3>Ahmadu Bello University</h3>
+          <p>Zaria, Kaduna State · Nigeria<br>Est. 1962 · Nigeria's Largest University</p>
+        </div>
+      </div>
+      <div class="about-float">
+        <div class="af-ic"><i class="fas fa-award"></i></div>
+        <div class="af"><strong>ABU-Certified</strong><span>Research Platform</span></div>
+      </div>
+    </div>
+    <div class="reveal" style="transition-delay:.2s">
+      <div class="lbl"><i class="fas fa-info-circle"></i> About Us</div>
+      <h2 class="ttl">Transforming Academic Research at <span>ABU & Beyond</span></h2>
+      <p class="sub">ABU SmartSurvey was created to solve a persistent challenge in Nigerian university research — the difficulty of finding quality, targeted respondents. We bridge the gap between researchers who need data and students who want to contribute to knowledge.</p>
+      <div class="about-pillars">
+        <div class="pillar"><i class="fas fa-bullseye"></i><div><h4>Our Mission</h4><p>To accelerate academic research by connecting researchers with verified, willing participants across Nigerian universities.</p></div></div>
+        <div class="pillar"><i class="fas fa-eye"></i><div><h4>Our Vision</h4><p>A thriving ecosystem where every researcher can access quality data and every student's contribution to science is recognized.</p></div></div>
+        <div class="pillar"><i class="fas fa-handshake"></i><div><h4>Our Values</h4><p>Integrity, academic excellence, community, and the belief that good data drives better decisions and stronger research.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="reveal">
+    <div class="lbl"><i class="fas fa-images"></i> Platform Gallery</div>
+    <h2 class="ttl ttl-w">Research <span>Community</span> in Action</h2>
+    <p class="sub sub-w">A glimpse into the academic research community powered by ABU SmartSurvey.</p>
+  </div>
+  <div class="gal-grid reveal" style="transition-delay:.2s">
+    <div class="gal-it"><div class="gal-bg"><i class="fas fa-university gal-ic"></i><span class="gal-tx">ABU Campus · Zaria</span></div><div class="gal-ov"><i class="fas fa-search-plus"></i><span>ABU Main Campus</span></div></div>
+    <div class="gal-it"><div class="gal-bg"><i class="fas fa-microscope gal-ic"></i><span class="gal-tx">Research Lab</span></div><div class="gal-ov"><i class="fas fa-search-plus"></i><span>Research Facilities</span></div></div>
+    <div class="gal-it"><div class="gal-bg"><i class="fas fa-book-open gal-ic"></i><span class="gal-tx">Academic Library</span></div><div class="gal-ov"><i class="fas fa-search-plus"></i><span>University Library</span></div></div>
+    <div class="gal-it"><div class="gal-bg"><i class="fas fa-laptop-code gal-ic"></i><span class="gal-tx">Digital Survey Hub</span></div><div class="gal-ov"><i class="fas fa-search-plus"></i><span>Digital Platform</span></div></div>
+    <div class="gal-it"><div class="gal-bg"><i class="fas fa-user-graduate gal-ic"></i><span class="gal-tx">Student Participants</span></div><div class="gal-ov"><i class="fas fa-search-plus"></i><span>Our Community</span></div></div>
+  </div>
+</section>
+
+<!-- COMMUNITY -->
+<section id="community">
+  <div class="comm-grid">
+    <div class="reveal">
+      <div class="lbl"><i class="fas fa-trophy"></i> Community</div>
+      <h2 class="ttl">A Rewarding <span>Research Community</span></h2>
+      <p class="sub">Participants earn recognition for their contributions. Our leaderboard and achievement system makes research participation engaging and meaningful.</p>
+      <div class="badges-wrap">
+        <h3>Achievement Badges</h3>
+        <div class="bdg-grid">
+          <div class="bdg gd"><i class="fas fa-star"></i><strong>First Study</strong><span>Complete first survey</span></div>
+          <div class="bdg gr"><i class="fas fa-fire"></i><strong>Active Contributor</strong><span>10+ surveys done</span></div>
+          <div class="bdg sk"><i class="fas fa-crown"></i><strong>Research Champion</strong><span>Top 5% contributor</span></div>
+          <div class="bdg gd"><i class="fas fa-medal"></i><strong>Consistent Giver</strong><span>30-day streak</span></div>
+          <div class="bdg gr"><i class="fas fa-bolt"></i><strong>Quick Responder</strong><span>Respond within 24hrs</span></div>
+          <div class="bdg sk"><i class="fas fa-gem"></i><strong>Diamond Scholar</strong><span>50+ surveys done</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="transition-delay:.2s">
+      <div class="lboard">
+        <div class="lb-hd"><i class="fas fa-trophy"></i><h3>Top Contributors</h3></div>
+        <div class="lb-row"><div class="lb-rk rk-g">1</div><div class="lb-av" style="background:linear-gradient(135deg,#006400,#22A722)">A</div><div class="lb-inf"><strong>Aisha Musa Ibrahim</strong><span>Medicine &amp; Surgery · 500L</span></div><div class="lb-ct"><i class="fas fa-check-circle"></i> 47</div></div>
+        <div class="lb-row"><div class="lb-rk rk-s">2</div><div class="lb-av" style="background:linear-gradient(135deg,#C8961A,#F0C040)">K</div><div class="lb-inf"><strong>Kabiru Usman Ahmed</strong><span>Engineering · 400L</span></div><div class="lb-ct"><i class="fas fa-check-circle"></i> 41</div></div>
+        <div class="lb-row"><div class="lb-rk rk-b">3</div><div class="lb-av" style="background:linear-gradient(135deg,#003D00,#006400)">F</div><div class="lb-inf"><strong>Fatima Suleiman Bello</strong><span>Social Sciences · 300L</span></div><div class="lb-ct"><i class="fas fa-check-circle"></i> 38</div></div>
+        <div class="lb-row"><div class="lb-rk rk-o">4</div><div class="lb-av" style="background:linear-gradient(135deg,#1A4D1A,#22A722)">Y</div><div class="lb-inf"><strong>Yusuf Garba Mohammed</strong><span>Law · 500L</span></div><div class="lb-ct"><i class="fas fa-check-circle"></i> 35</div></div>
+        <div class="lb-row"><div class="lb-rk rk-o">5</div><div class="lb-av" style="background:linear-gradient(135deg,#C8961A,#006400)">Z</div><div class="lb-inf"><strong>Zainab Hassan Dantata</strong><span>Sciences · 200L</span></div><div class="lb-ct"><i class="fas fa-check-circle"></i> 29</div></div>
+        <div class="lb-row"><div class="lb-rk rk-o">6</div><div class="lb-av" style="background:linear-gradient(135deg,#002800,#4DC94D)">E</div><div class="lb-inf"><strong>Emmanuel Okonkwo</strong><span>Agriculture · 400L</span></div><div class="lb-ct"><i class="fas fa-check-circle"></i> 24</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="testi-hd">
+    <div class="reveal">
+      <div class="lbl"><i class="fas fa-comments"></i> Testimonials</div>
+      <h2 class="ttl">What the ABU <span>Community Says</span></h2>
+    </div>
+    <div class="t-ctrls reveal">
+      <button class="t-btn" onclick="tSlide(-1)"><i class="fas fa-arrow-left"></i></button>
+      <button class="t-btn" onclick="tSlide(1)"><i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+  <div class="t-slider reveal">
+    <div class="t-track" id="tTrack">
+      <div class="t-card"><div class="t-qi"><i class="fas fa-quote-left"></i></div><div class="t-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="t-txt">"ABU SmartSurvey completely transformed how I collected data for my postgraduate thesis. I reached 200 targeted respondents in under 48 hours. What used to take months now takes days."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#006400,#22A722)">D</div><div class="t-ai"><strong>Dr. Danladi Audu</strong><span>Lecturer, Faculty of Social Sciences · ABU Zaria</span></div></div></div>
+      <div class="t-card"><div class="t-qi"><i class="fas fa-quote-left"></i></div><div class="t-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="t-txt">"As a 400-level student, I've participated in 30+ research surveys on this platform. The achievement system makes it genuinely motivating. I feel I'm contributing to real academic progress."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#C8961A,#F0C040)">M</div><div class="t-ai"><strong>Maryam Idris</strong><span>Student, Department of Economics · ABU Zaria</span></div></div></div>
+      <div class="t-card"><div class="t-qi"><i class="fas fa-quote-left"></i></div><div class="t-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div><p class="t-txt">"The audience targeting is incredibly precise. I needed 300-level pharmacy students aged 18–25 and got exactly that within a day. The data quality has been consistently outstanding."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#003D00,#008000)">P</div><div class="t-ai"><strong>Prof. Patience Oluwaseun</strong><span>Researcher, Faculty of Pharmaceutical Sciences</span></div></div></div>
+      <div class="t-card"><div class="t-qi"><i class="fas fa-quote-left"></i></div><div class="t-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="t-txt">"I've recommended ABU SmartSurvey to every colleague in my department. The platform is intuitive, the admin team is responsive, and the quality of respondents is far above anything else I've tried."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#1A4D1A,#4DC94D)">A</div><div class="t-ai"><strong>Aliyu Bello Umar</strong><span>Postgraduate Researcher, Faculty of Engineering</span></div></div></div>
+      <div class="t-card"><div class="t-qi"><i class="fas fa-quote-left"></i></div><div class="t-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p class="t-txt">"Being a top contributor on the leaderboard has been motivating me to engage with research I genuinely care about. ABU SmartSurvey makes research participation feel valued and recognized."</p><div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#C8961A,#006400)">N</div><div class="t-ai"><strong>Ngozi Eze</strong><span>Student, Faculty of Medicine · 500L</span></div></div></div>
+    </div>
+    <div class="t-dots" id="tDots"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-in">
+    <div class="reveal">
+      <div class="lbl"><i class="fas fa-rocket"></i> Get Started Today</div>
+      <h2 class="ttl ttl-w" style="text-align:center;max-width:600px;margin:0 auto 20px">Ready to Advance Your <span>Research?</span></h2>
+      <p class="sub sub-w" style="margin:0 auto;text-align:center;max-width:500px">Join thousands of researchers and participants already using ABU SmartSurvey to power academic discovery.</p>
+      <div class="cta-btns">
+        <a href="#" class="btn-p"><i class="fas fa-flask"></i> Start a Research Project</a>
+        <a href="#" class="btn-s"><i class="fas fa-user-plus"></i> Join as Respondent</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-top">
+    <div class="ft-brand">
+      <a href="#hero" class="nav-logo" style="text-decoration:none">
+        <div class="nav-crest">
+          <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" style="color:#00AA00">
+            <path d="M100 8 C100 8 30 60 20 130 C15 170 30 200 60 210 C80 218 120 218 140 210 C170 200 185 170 180 130 C170 60 100 8 100 8Z" stroke="currentColor" stroke-width="8" fill="none"/>
+            <circle cx="100" cy="20" r="8" stroke="currentColor" stroke-width="6" fill="none"/>
+            <circle cx="30" cy="195" r="7" stroke="currentColor" stroke-width="5" fill="none"/>
+            <circle cx="170" cy="195" r="7" stroke="currentColor" stroke-width="5" fill="none"/>
+            <path d="M70 80 Q100 60 130 80 Q120 110 100 120 Q80 110 70 80Z" stroke="currentColor" stroke-width="6" fill="none"/>
+            <path d="M60 130 Q100 110 140 130" stroke="currentColor" stroke-width="5" fill="none"/>
+            <path d="M65 155 Q100 140 135 155" stroke="currentColor" stroke-width="4" fill="none"/>
+            <path d="M90 48 L100 35 L110 48" stroke="currentColor" stroke-width="4" fill="none"/>
+            <circle cx="100" cy="95" r="4" stroke="currentColor" stroke-width="4" fill="none"/>
+          </svg>
+        </div>
+        <div class="nav-txt"><strong>ABU SmartSurvey</strong><span>Research Platform</span></div>
+      </a>
+      <p>The premier academic research participation network connecting researchers with verified respondents across Nigerian universities.</p>
+      <div class="ft-soc">
+        <a href="#" class="ft-sl"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="ft-sl"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" class="ft-sl"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="ft-sl"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="ft-sl"><i class="fab fa-whatsapp"></i></a>
+      </div>
+      <div class="ft-news" style="margin-top:26px">
+        <p><i class="fas fa-envelope" style="color:var(--g300);margin-right:8px"></i>Stay updated on research opportunities</p>
+        <div class="nl-form">
+          <input type="email" placeholder="Your university email">
+          <button><i class="fas fa-paper-plane"></i> Subscribe</button>
+        </div>
+      </div>
+    </div>
+    <div class="ft-col">
+      <h4>For Researchers</h4>
+      <ul>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Start a Project</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Audience Targeting</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Survey Management</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Analytics Dashboard</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Research Guidelines</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>For Participants</h4>
+      <ul>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Create Profile</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Browse Studies</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Leaderboard</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Achievements</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Participation History</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> About ABU SmartSurvey</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Terms of Service</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Contact Support</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-btm">
+    <p>&copy; 2025 <a href="#">ABU SmartSurvey</a>. All rights reserved. A Research Platform of Ahmadu Bello University, Zaria.</p>
+    <div class="ft-btl"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
+  </div>
+</footer>
+
+<!-- BACK TO TOP -->
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+// PRELOADER
+window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('preloader').classList.add('hidden')},1300)});
+
+// NAV SCROLL
+const nb=document.getElementById('navbar'),btt=document.getElementById('btt');
+window.addEventListener('scroll',()=>{
+  const s=window.scrollY>60;
+  nb.classList.toggle('scrolled',s);
+  btt.classList.toggle('vis',s);
+});
+
+// MOBILE MENU
+const nt=document.getElementById('navToggle'),mm=document.getElementById('mobMenu');
+let mo=false;
+nt.addEventListener('click',()=>{mo=!mo;mm.classList.toggle('open',mo);nt.querySelector('i').className=mo?'fas fa-times':'fas fa-bars'});
+function closeMob(){mo=false;mm.classList.remove('open');nt.querySelector('i').className='fas fa-bars'}
+
+// HERO CANVAS — green network
+const cv=document.getElementById('hero-canvas');
+const cx=cv.getContext('2d');
+let nodes=[];
+function rsz(){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight}
+function initN(){
+  nodes=[];
+  const n=Math.floor(cv.width*cv.height/16000);
+  for(let i=0;i<n;i++) nodes.push({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*2.2+.8,p:Math.random()*Math.PI*2});
+}
+function draw(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  nodes.forEach(n=>{
+    n.x+=n.vx; n.y+=n.vy; n.p+=.018;
+    if(n.x<0||n.x>cv.width)n.vx*=-1;
+    if(n.y<0||n.y>cv.height)n.vy*=-1;
+    const pu=Math.sin(n.p)*.3+.7;
+    cx.beginPath(); cx.arc(n.x,n.y,n.r*pu,0,Math.PI*2);
+    cx.fillStyle=`rgba(0,160,0,${.55*pu})`; cx.fill();
+  });
+  nodes.forEach((a,i)=>nodes.slice(i+1).forEach(b=>{
+    const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<130){
+      cx.beginPath(); cx.moveTo(a.x,a.y); cx.lineTo(b.x,b.y);
+      cx.strokeStyle=`rgba(0,140,0,${(1-d/130)*.2})`; cx.lineWidth=.7; cx.stroke();
+    }
+  }));
+  requestAnimationFrame(draw);
+}
+rsz(); initN(); draw();
+window.addEventListener('resize',()=>{rsz();initN()});
+
+// TABS
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('on',(i===0&&t==='r')||(i===1&&t==='p')));
+  document.getElementById('panel-r').classList.toggle('on',t==='r');
+  document.getElementById('panel-p').classList.toggle('on',t==='p');
+}
+
+// SCROLL REVEAL
+const revs=document.querySelectorAll('.reveal');
+const ro=new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('vis')}),{threshold:.1});
+revs.forEach(r=>ro.observe(r));
+
+// COUNTERS
+function animCt(el,t,d=1800){
+  let s=null;
+  function step(ts){
+    if(!s)s=ts;
+    const p=Math.min((ts-s)/d,1);
+    const e=1-Math.pow(1-p,3);
+    el.textContent=Math.floor(e*t).toLocaleString();
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+const co=new IntersectionObserver(e=>e.forEach(en=>{
+  if(en.isIntersecting){animCt(en.target,parseInt(en.target.dataset.t));co.unobserve(en.target)}
+}),{threshold:.5});
+document.querySelectorAll('.cnt,.cnt-s').forEach(c=>co.observe(c));
+
+// TESTIMONIALS SLIDER
+const tt=document.getElementById('tTrack');
+const tcs=tt.querySelectorAll('.t-card');
+const td=document.getElementById('tDots');
+let tCur=0;
+let tVis=window.innerWidth>=1024?3:window.innerWidth>=768?2:1;
+function bldDots(){
+  td.innerHTML='';
+  const tot=Math.ceil(tcs.length/tVis);
+  for(let i=0;i<tot;i++){
+    const d=document.createElement('div');
+    d.className='t-dot'+(i===0?' on':'');
+    d.onclick=()=>goT(i);
+    td.appendChild(d);
+  }
+}
+function goT(n){
+  const tot=Math.ceil(tcs.length/tVis);
+  tCur=Math.max(0,Math.min(n,tot-1));
+  const w=tcs[0].offsetWidth+26;
+  tt.style.transform=`translateX(-${tCur*tVis*w}px)`;
+  document.querySelectorAll('.t-dot').forEach((d,i)=>d.classList.toggle('on',i===tCur));
+}
+function tSlide(d){const t=Math.ceil(tcs.length/tVis);goT((tCur+d+t)%t)}
+bldDots();
+window.addEventListener('resize',()=>{tVis=window.innerWidth>=1024?3:window.innerWidth>=768?2:1;bldDots();goT(0)});
+setInterval(()=>tSlide(1),5000);
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+  const t=document.querySelector(a.getAttribute('href'));
+  if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}
+}));
+</script>
+</body>
+</html>
+HTMLEOF
+echo "Done"
+Done
+
+
+
+
+
