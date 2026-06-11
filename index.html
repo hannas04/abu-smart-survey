@@ -31,7 +31,11 @@
   --gap:100px;
 }
 html{scroll-behavior:smooth}
+html, body{overflow-x:hidden;}
 body{font-family:'Inter',sans-serif;background:var(--white);color:var(--text);overflow-x:hidden;line-height:1.6}
+button,a,input,textarea,select{min-width:0;}
+input,textarea,select{font-size:16px;}
+img,svg,iframe,video,canvas{max-width:100%;height:auto;}
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:var(--g900)}
 ::-webkit-scrollbar-thumb{background:var(--g600);border-radius:3px}

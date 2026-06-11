@@ -18,7 +18,11 @@
   --radius:16px;--card:#fff;--border:#ddefdd;
 }
 html{scroll-behavior:smooth}
+html, body{overflow-x:hidden;}
 body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--text);min-height:100vh}
+button,a,input,textarea,select{min-width:0;}
+input,textarea,select{font-size:16px;}
+img,svg,iframe,video,canvas{max-width:100%;height:auto;}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#f0f0f0}::-webkit-scrollbar-thumb{background:var(--g400);border-radius:3px}
 
 /* ── LOGIN SCREEN ── */
@@ -37,7 +41,7 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--text);min-
 .lf-group label{display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .lf-input{position:relative}
 .lf-input i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:14px}
-.lf-input input{width:100%;padding:13px 14px 13px 42px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .3s}
+.lf-input input{width:100%;padding:13px 14px 13px 42px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;font-size:16px;font-family:'Inter',sans-serif;outline:none;transition:border-color .3s}
 .lf-input input::placeholder{color:rgba(255,255,255,.25)}
 .lf-input input:focus{border-color:var(--g400)}
 .lf-err{font-size:12px;color:#FF6B6B;margin-top:6px;display:none}
@@ -70,6 +74,22 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--text);min-
 .dash-prof-info span{font-size:11px;color:var(--g300)}
 .btn-logout{padding:8px 16px;background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);border-radius:8px;color:rgba(255,150,150,.9);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px}
 .btn-logout:hover{background:rgba(255,80,80,.25);color:#fff}
+
+.nav-menu-toggle{display:none;align-items:center;justify-content:center;width:38px;height:38px;border:none;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff;cursor:pointer;font-size:18px}
+.nav-menu-toggle i{line-height:1}
+.mobile-menu{position:fixed;top:76px;right:16px;width:calc(100% - 32px);max-width:260px;background:#fff;border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.06);opacity:0;visibility:hidden;transform:translateY(-8px);transition:.25s ease,opacity .25s ease,visibility .25s ease}
+.mobile-menu.open{opacity:1;visibility:visible;transform:translateY(0)}
+.mobile-menu-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.mobile-menu-header h3{font-size:14px;font-weight:700;color:var(--text);margin:0}
+.mobile-menu-close{width:34px;height:34px;border:none;border-radius:10px;background:var(--g50);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+.mobile-menu-profile{display:flex;align-items:center;gap:12px;padding:16px}
+.mobile-menu-profile .dash-av{width:42px;height:42px;font-size:16px}
+.mobile-menu-profile-info strong{display:block;font-size:13px;color:var(--text);font-weight:700}
+.mobile-menu-profile-info span{font-size:11px;color:var(--text-m)}
+.mobile-menu-item{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border:none;background:none;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;border-top:1px solid var(--border);text-align:left}
+.mobile-menu-item:first-of-type{border-top:none}
+.mobile-menu-item i{color:var(--g600);min-width:20px;text-align:center}
+.menu-badge{background:var(--gold);color:var(--g900);font-size:10px;font-weight:700;padding:4px 8px;border-radius:12px}
 
 /* BODY LAYOUT */
 .dash-body{display:grid;grid-template-columns:250px 1fr;flex:1;min-height:0}
@@ -129,12 +149,12 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--text);min-
 .sv-mid-it{text-align:center}
 .sv-mid-it strong{display:block;font-size:16px;font-weight:700;color:var(--text)}
 .sv-mid-it span{font-size:10px;color:var(--text-l);text-transform:uppercase;letter-spacing:.5px}
-.sv-card-bot{padding:14px 22px;display:flex;align-items:center;gap:10px}
-.sv-author{display:flex;align-items:center;gap:8px;flex:1}
+.sv-card-bot{padding:14px 22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
+.sv-author{display:flex;align-items:center;gap:8px;flex:1 1 220px;min-width:0}
 .sv-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--g600),var(--g400));display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
 .sv-author-inf strong{font-size:12px;color:var(--text);font-weight:600}
 .sv-author-inf span{font-size:10px;color:var(--text-l);display:block}
-.btn-link{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none}
+.btn-link{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none;flex:1 1 120px;min-width:120px;justify-content:center}
 .btn-link.pri{background:var(--g600);color:#fff}
 .btn-link.pri:hover{background:var(--g500)}
 .btn-link.sec{background:var(--g100);color:var(--g700)}
@@ -162,7 +182,7 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--text);min-
 .form-group{margin-bottom:18px}
 .form-group label{display:block;font-size:12px;font-weight:700;color:var(--text-m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .form-group label span.req{color:#dc2626}
-.form-inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);background:#fff;outline:none;transition:border-color .3s}
+.form-inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-family:'Inter',sans-serif;color:var(--text);background:#fff;outline:none;transition:border-color .3s}
 .form-inp:focus{border-color:var(--g500)}
 .form-inp::placeholder{color:var(--text-l)}
 textarea.form-inp{resize:vertical;min-height:90px;line-height:1.6}
@@ -240,7 +260,12 @@ select.form-inp{cursor:pointer;appearance:none;background-image:url("data:image/
   .page-hd{flex-direction:column}
   .detail-stat-row{grid-template-columns:repeat(3,1fr)}
   .dash-prof-info{display:none}
+  .dash-logo span{font-size:13px}
+  .dash-logo small{font-size:9px}
+  .dash-nav-right{display:none}
+  .nav-menu-toggle{display:flex}
 }
+
 </style>
 </head>
 <body>
@@ -331,7 +356,24 @@ select.form-inp{cursor:pointer;appearance:none;background-image:url("data:image/
       </div>
       <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
+  <button class="nav-menu-toggle" onclick="toggleMobileMenu()" aria-label="Open menu"><i class="fas fa-ellipsis-v"></i></button>
   </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+      <h3>Account</h3>
+      <button class="mobile-menu-close" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="mobile-menu-profile">
+      <div class="dash-av">S</div>
+      <div class="mobile-menu-profile-info">
+        <strong>Prof. Sodiq</strong>
+        <span>ABU Zaria</span>
+      </div>
+    </div>
+    <button class="mobile-menu-item" onclick="doLogout()"><span><i class="fas fa-sign-out-alt"></i> Logout</span></button>
+    <button class="mobile-menu-item"><span><i class="fas fa-bell"></i> Notifications</span><span class="menu-badge">2</span></button>
+  </div>
 
   <!-- BODY -->
   <div class="dash-body">
@@ -602,6 +644,15 @@ function doLogout() {
   document.getElementById('dashboard').classList.remove('active');
   document.getElementById('inp-user').value = '';
   document.getElementById('inp-pass').value = '';
+  closeMobileMenu();
+}
+
+function toggleMobileMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+function closeMobileMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
 }
 
 // Enter key on login
